@@ -68,10 +68,35 @@
             <p id="task-status" class="mt-3 text-xs text-slate-400 text-center"></p>
         </section>
 
+        <!-- 全局影片預覽卡片 (顯示在輸入框下方，載入與結果區上方) -->
+        <div id="pre-info"
+            class="hidden w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-md border mb-8 p-5 flex items-center gap-6">
+            <img id="pre-thumb" src=""
+                class="w-32 h-32 object-cover rounded-xl shadow-inner bg-slate-100 flex-shrink-0">
+            <div class="flex-grow">
+                <h4 id="pre-title" class="font-bold text-slate-800 text-lg leading-tight mb-2">正在讀取影片資訊...</h4>
+                <div class="flex flex-wrap gap-4 text-sm">
+                    <span id="pre-channel-wrap" class="flex items-center text-slate-600">
+                        <i data-lucide="user" class="size-4 mr-1 text-blue-500"></i>
+                        <span id="pre-channel"></span>
+                    </span>
+                    <span id="pre-duration-wrap" class="flex items-center text-slate-600">
+                        <i data-lucide="clock" class="size-4 mr-1 text-blue-500"></i>
+                        <span id="pre-duration"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <!-- 載入中狀態 (僅在發送任務後顯示) -->
-        <div id="loading" class="hidden flex flex-col items-center justify-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p class="mt-4 text-slate-500 font-bold">Colab 正在處理中，這通常需要 3-5 分鐘...</p>
+        <div id="loading" class="hidden flex flex-col items-center justify-center py-10">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-6"></div>
+            <p id="progress-msg" class="text-slate-500 font-bold mb-4">Colab 正在認領任務...</p>
+
+            <!-- 動態進度條 -->
+            <div class="w-full max-w-xs h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-blue-600 transition-all duration-500" style="width: 0%"></div>
+            </div>
         </div>
 
         <!-- 內容展示區 -->
@@ -113,11 +138,11 @@
                                 (.srt)</span>
                             <i data-lucide="external-link" class="size-4 opacity-50"></i>
                         </a>
-                        <a id="download-mp3" href="#" target="_blank"
+                        <a id="source-link" href="#" target="_blank"
                             class="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors p-4 rounded-xl border border-white/10">
-                            <span class="flex items-center"><i data-lucide="headphones" class="mr-3"></i> 原始音訊
-                                (.mp3)</span>
-                            <i data-lucide="external-link" class="size-4 opacity-50"></i>
+                            <span class="flex items-center"><i data-lucide="external-link" class="mr-3"></i>
+                                前往原始來源</span>
+                            <i data-lucide="chevron-right" class="size-4 opacity-50"></i>
                         </a>
                     </div>
                 </div>
@@ -202,16 +227,17 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        // 新增了 where
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, onSnapshot, addDoc, serverTimestamp, where, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // --- Firebase 配置 (預留位，部署時由 GitHub Actions 自動替換) ---
         const firebaseConfig = {
-            apiKey: "AIzaSyDK8b3B9Q41RdLX-wKa_BBbTDjKizf75-w",
-            authDomain: "whisge-1683c.firebaseapp.com",
-            projectId: "whisge-1683c",
-            storageBucket: "whisge-1683c.firebasestorage.app",
-            messagingSenderId: "726503147127",
-            appId: "1:726503147127:web:927ad305113724a3d86872"
+            apiKey: "VITE_FIREBASE_API_KEY",
+            authDomain: "VITE_FIREBASE_AUTH_DOMAIN",
+            projectId: "VITE_FIREBASE_PROJECT_ID",
+            storageBucket: "VITE_FIREBASE_STORAGE_BUCKET",
+            messagingSenderId: "VITE_FIREBASE_MESSAGING_SENDER_ID",
+            appId: "VITE_FIREBASE_APP_ID",
+            measurementId: "VITE_FIREBASE_MEASUREMENT_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -221,31 +247,28 @@
         window.toggleModal = () => {
             const modal = document.getElementById('architecture-modal');
             modal.classList.toggle('hidden');
-            // 如果打開視窗，可能會有新的 icon 渲染
             lucide.createIcons();
         };
 
-        // 紀錄目前等待的任務ID和取消監聽的函式
         let currentUnsubscribe = null;
 
         // --- 發送任務至 Colab ---
         window.sendTaskToColab = async () => {
-            const url = document.getElementById('sourceUrl').value;
-            if (!url) return alert("請輸入網址");
+            const url = document.getElementById('sourceUrl').value.trim();
+            if (!url) return;
 
             document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('content').classList.add('hidden');
+            document.getElementById('pre-info').classList.add('hidden'); // 先隱藏預覽卡片
             document.getElementById('task-status').innerText = "任務已送達 Firebase，等待 Colab 認領...";
 
             try {
-                // 1. 新增 Task 並取得 Document Reference
                 const docRef = await addDoc(collection(db, "tasks"), {
                     url: url,
                     status: "pending",
                     timestamp: serverTimestamp()
                 });
-
-                // 2. 啟動精準監聽對應 Task ID 的結果
-                listenToSpecificResult(docRef.id);
+                listenToSpecificResult(docRef.id, url);
             } catch (e) {
                 alert("發送失敗: " + e.message);
                 document.getElementById('loading').classList.add('hidden');
@@ -257,51 +280,112 @@
             document.getElementById('task-status').innerText = '';
         };
 
-        // --- 監聽特定任務分析結果 (需 Colab 配合回傳 taskId) ---
-        function listenToSpecificResult(taskId) {
-            // 如果前一次有監聽，先取消避免重複觸發
+        // --- 監聽特定任務分析結果與進度 ---
+        function listenToSpecificResult(taskId, originalUrl) {
             if (currentUnsubscribe) currentUnsubscribe();
 
-            // 注意：需要 Colab 在寫入 transcripts 集合時加上 "taskId": 傳進去的ID
+            document.getElementById('progress-bar').style.width = "0%";
+            document.getElementById('pre-info').classList.add('hidden');
+
+            // ⚡ A. 監聽任務過程 (進度條、預覽資訊)
+            const taskSub = onSnapshot(doc(db, "tasks", taskId), (docSnap) => {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+
+                if (data.status === "failed") {
+                    document.getElementById('loading').classList.add('hidden');
+
+                    // 常用錯誤碼翻譯
+                    const rawError = data.error_msg || "";
+                    let friendlyMsg = "後端處理發生異常，請稍後再試";
+
+                    const errorMap = {
+                        "429": "⚠️ 額度已達上限！請等候幾分鐘再試。",
+                        "ASPH": "⚠️ 每小時轉錄時數已滿，請稍後再試。",
+                        "Quota": "⚠️ Google API 次數或字數限制已滿，請等候一分鐘。",
+                        "QuotaFailure": "⚠️ Google API 次數或字數限制已滿，請等候一分鐘。",
+                        "401": "🔑 API 金鑰失效，請聯繫管理員。",
+                        "400": "🚫 連結無效或格式不支援，請再檢查。",
+                        "500": "💣 伺服器忙碌中，請點擊重試。",
+                        "503": "🚧 服務維護中，請稍候再回訪。"
+                    };
+
+                    // 尋找匹配的錯誤訊息
+                    for (const key in errorMap) {
+                        if (rawError.includes(key)) {
+                            friendlyMsg = errorMap[key];
+                            break;
+                        }
+                    }
+
+                    alert(`❌ 任務失敗\n\n${friendlyMsg}\n\n(詳情: ${rawError.substring(0, 50)}...)`);
+                    taskSub();
+                    return;
+                }
+
+                if (data.status_msg) document.getElementById('progress-msg').innerText = data.status_msg;
+                if (data.progress) document.getElementById('progress-bar').style.width = data.progress + "%";
+
+                if (data.metadata) {
+                    const infoBox = document.getElementById('pre-info');
+                    infoBox.classList.remove('hidden');
+                    document.getElementById('pre-thumb').src = data.metadata.thumbnail;
+                    document.getElementById('pre-title').innerText = data.metadata.title;
+                    document.getElementById('pre-channel').innerText = data.metadata.channel;
+                    document.getElementById('pre-duration').innerText = data.metadata.duration_text || "";
+                    lucide.createIcons();
+                }
+            });
+
+            // ⚡ B. 監聽最終結果
             const q = query(collection(db, "transcripts"), where("taskId", "==", taskId));
-
-            currentUnsubscribe = onSnapshot(q, (snapshot) => {
+            const resultSub = onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) return;
-
                 const data = snapshot.docs[0].data();
-                updateUI(data);
+
+                updateUI(data, originalUrl);
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
                 document.getElementById('task-status').innerText = "分析完成！";
 
-                // 拿到資料後可以停止監聽該筆任務了
-                currentUnsubscribe();
+                // 任務完成後取消監聽
+                taskSub();
+                resultSub();
             });
+
+            currentUnsubscribe = () => { taskSub(); resultSub(); };
         }
 
-        function updateUI(data) {
-            // 掛載資料至介面 (維持你的原寫法)
+        function updateUI(data, originalUrl) {
             document.getElementById('display-title').innerText = data.title;
             document.getElementById('display-insight').innerText = data.investment_insight;
             if (data.timestamp) document.getElementById('display-date').innerText = data.timestamp.toDate().toLocaleString();
 
             const highlightsEl = document.getElementById('display-highlights');
-            highlightsEl.innerHTML = data.highlights.map(h => `
+            highlightsEl.innerHTML = data.highlights.map(h => {
+                let jumpUrl = "#";
+                if (originalUrl.includes("youtube.com") || originalUrl.includes("youtu.be")) {
+                    const parts = h.timeStart.split(':');
+                    const seconds = (+parts[0]) * 3600 + (+parts[1]) * 60 + (+parts[2]);
+                    const videoIdMatch = originalUrl.match(/(?:\?v=|\/embed\/|\/watch\?v=|\/v\/|\/u\/\w\/|youtu\.be\/|shorts\/)([^#&?]*).*/);
+                    const videoId = videoIdMatch ? videoIdMatch[1] : "";
+                    jumpUrl = `https://www.youtube.com/watch?v=${videoId}&t=${seconds}s`;
+                }
+
+                return `
                 <div class="group relative border-l-2 border-slate-100 pl-6 pb-2">
                     <div class="absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-white bg-slate-200"></div>
-                    <div class="text-xs font-mono font-bold text-blue-500 mb-1">${h.timeStart}</div>
+                    <a href="${jumpUrl}" target="_blank" class="text-xs font-mono font-bold text-blue-500 mb-1 hover:underline flex items-center">
+                        <i data-lucide="play-circle" class="size-3 mr-1"></i> ${h.timeStart}
+                    </a>
                     <p class="text-slate-800 font-bold text-base">${h.desc}</p>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
 
-            // 給按鈕加上 download 屬性以防萬一
-            const btnSrt = document.getElementById('download-srt');
-            const btnMp3 = document.getElementById('download-mp3');
-            btnSrt.href = data.srt_url;
-            btnSrt.setAttribute('download', 'transcript.srt');
-            btnMp3.href = data.mp3_url;
-            btnMp3.setAttribute('download', 'audio.mp3');
+            // 資源下載與連結
+            document.getElementById('download-srt').href = data.srt_url;
+            document.getElementById('source-link').href = originalUrl;
 
             lucide.createIcons();
         }
