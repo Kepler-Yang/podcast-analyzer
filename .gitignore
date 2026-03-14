@@ -1,0 +1,14 @@
+# 忽略 Firebase 金鑰
+serviceAccountKey.json
+
+# 或者更安全的做法：忽略專案中所有的 JSON 金鑰檔
+*.json
+
+# 忽略 Test檔案
+test*
+temp*
+
+# 額外建議：忽略 Python 的快取與環境資料
+__pycache__/
+.env
+venv/
