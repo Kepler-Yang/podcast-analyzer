@@ -226,6 +226,46 @@
                             <code>taskId</code> 寫回 Firebase。Firebase 察覺後立刻發送推播給等待中的前端 HTML，網頁隨即解除轉圈圈狀態這整份結果渲染至畫面。
                         </p>
                     </div>
+
+                    <!-- 新增：免費仔的開發辛酸血淚 (摺疊區塊) -->
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <button onclick="toggleFrugalSection()" class="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors group">
+                            <span class="font-bold text-orange-700 flex items-center">
+                                <i data-lucide="ghost" class="mr-2 size-5"></i> 
+                                開發者的辛酸血淚：如何挑戰「零成本」極限？
+                            </span>
+                            <i id="frugal-chevron" data-lucide="chevron-down" class="text-orange-400 group-hover:text-orange-600 transition-transform"></i>
+                        </button>
+                        
+                        <div id="frugal-content" class="hidden mt-4 space-y-4 px-4 pb-4 text-sm text-slate-600 leading-relaxed">
+                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
+                                <h5 class="font-bold text-slate-800 mb-1">1. 突破 Groq 25MB 限制</h5>
+                                <p>Groq Whisper API 強制要求音檔在 25MB 以下。開發中花了大量時間研究 <code>yt-dlp</code> 參數，依據影片時長動態計算傳輸位元率，力求在不失真的情況下精準壓在 24.9MB 跳舞。</p>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
+                                <h5 class="font-bold text-slate-800 mb-1">2. 雙重壓縮防線 (FFmpeg)</h5>
+                                <p>為了防止下載器失控，緊急追加了 <code>FFmpeg</code> 二次強制壓縮功能。雖然 Render 的免費 CPU 運算緩慢，但這是確保任務不被 API 彈回的最後一道保險。</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
+                                <h5 class="font-bold text-slate-800 mb-1">3. Render 的「生存防護」技巧</h5>
+                                <p>為了省下每月 7 美金的背景服務費，我們使用了 Render Web Service 配合外部 Cron Job 工具。定時叫醒服務防止其休眠，這才達成了趨近 24 小時的待機運作。</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
+                                <h5 class="font-bold text-slate-800 mb-1">4. 儲存與流量的現實考量</h5>
+                                <p>原本想提供 MP3 下載，但考量到 Firebase 免費版僅有 5GB 空間與 10GB 每月流量，幾部長篇 Podcast 就會塞爆。因此忍痛捨棄大檔下載，專注於輕量化的分析文本。</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
+                                <h5 class="font-bold text-slate-800 mb-1">5. 與 Gemini API 的版本追逐戰</h5>
+                                <p>模型版本更新頻繁且不穩定。實驗過 <code>latest-flash</code> 塞車、<code>2.5-flash</code> 在雲端炸裂，最後選定 <code>2.0-flash</code> 作為目前兼顧穩定與效率的平衡點。</p>
+                            </div>
+
+                            <p class="text-xs text-slate-400 text-center italic pt-2">「在預算極限中尋求最優技術方案，是開發者的浪漫（跟痛苦）。」</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end">
@@ -264,6 +304,16 @@
             const modal = document.getElementById('architecture-modal');
             modal.classList.toggle('hidden');
             lucide.createIcons();
+        };
+
+        // 控制「免費仔辛酸血淚」區塊展開/收合
+        window.toggleFrugalSection = () => {
+            const content = document.getElementById('frugal-content');
+            const chevron = document.getElementById('frugal-chevron');
+            const isHidden = content.classList.contains('hidden');
+            
+            content.classList.toggle('hidden');
+            chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
         };
 
         let currentUnsubscribe = null;
