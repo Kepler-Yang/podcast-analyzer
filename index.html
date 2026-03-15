@@ -119,13 +119,15 @@
                         <!-- 新增：個股與族群標籤 -->
                         <div class="space-y-4 pt-6 border-t border-slate-100">
                             <div id="section-stocks" class="hidden">
-                                <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center">
+                                <h5
+                                    class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center">
                                     <i data-lucide="tag" class="size-4 mr-2"></i> 提及個股
                                 </h5>
                                 <div id="display-stocks" class="flex flex-wrap gap-2"></div>
                             </div>
                             <div id="section-sectors" class="hidden">
-                                <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center">
+                                <h5
+                                    class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center">
                                     <i data-lucide="layers" class="size-4 mr-2"></i> 產業族群
                                 </h5>
                                 <div id="display-sectors" class="flex flex-wrap gap-2"></div>
@@ -214,7 +216,7 @@
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-green-100 text-green-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">4</span>
                             雲端儲存 (Firebase Storage)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">後端運算完成後，將生成的逐字稿 (<code>.srt</code>) 
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">後端運算完成後，將生成的逐字稿 (<code>.srt</code>)
                             備份儲存到 Firebase Storage 之中，並產生專屬的下載連結。</p>
                     </div>
 
@@ -229,38 +231,52 @@
 
                     <!-- 新增：免費仔的開發辛酸血淚 (摺疊區塊) -->
                     <div class="mt-8 pt-6 border-t border-slate-100">
-                        <button onclick="toggleFrugalSection()" class="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors group">
+                        <button onclick="toggleFrugalSection()"
+                            class="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors group">
                             <span class="font-bold text-orange-700 flex items-center">
-                                <i data-lucide="ghost" class="mr-2 size-5"></i> 
+                                <i data-lucide="ghost" class="mr-2 size-5"></i>
                                 開發者的辛酸血淚：如何挑戰「零成本」極限？
                             </span>
-                            <i id="frugal-chevron" data-lucide="chevron-down" class="text-orange-400 group-hover:text-orange-600 transition-transform"></i>
+                            <i id="frugal-chevron" data-lucide="chevron-down"
+                                class="text-orange-400 group-hover:text-orange-600 transition-transform"></i>
                         </button>
-                        
-                        <div id="frugal-content" class="hidden mt-4 space-y-4 px-4 pb-4 text-sm text-slate-600 leading-relaxed">
+
+                        <div id="frugal-content"
+                            class="hidden mt-4 space-y-4 px-4 pb-4 text-sm text-slate-600 leading-relaxed">
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
                                 <h5 class="font-bold text-slate-800 mb-1">1. 突破 Groq 25MB 限制</h5>
-                                <p>Groq Whisper API 強制要求音檔在 25MB 以下。開發中花了大量時間研究 <code>yt-dlp</code> 參數，依據影片時長動態計算傳輸位元率，力求在不失真的情況下精準壓在 24.9MB 跳舞。</p>
+                                <p>Groq Whisper API 強制要求音檔在 25MB 以下。開發中花了大量時間研究 <code>yt-dlp</code>
+                                    參數，依據影片時長動態計算傳輸位元率，力求在不失真的情況下精準壓在 24.9MB 跳舞。</p>
                             </div>
-                            
+
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
                                 <h5 class="font-bold text-slate-800 mb-1">2. 雙重壓縮防線 (FFmpeg)</h5>
-                                <p>為了防止下載器失控，緊急追加了 <code>FFmpeg</code> 二次強制壓縮功能。雖然 Render 的免費 CPU 運算緩慢，但這是確保任務不被 API 彈回的最後一道保險。</p>
+                                <p>為了防止下載器失控，緊急追加了 <code>FFmpeg</code> 二次強制壓縮功能。雖然 Render 的免費 CPU 運算緩慢，但這是確保任務不被 API
+                                    彈回的最後一道保險。</p>
                             </div>
 
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
                                 <h5 class="font-bold text-slate-800 mb-1">3. Render 的「生存防護」技巧</h5>
-                                <p>為了省下每月 7 美金的背景服務費，我們使用了 Render Web Service 配合外部 Cron Job 工具。定時叫醒服務防止其休眠，這才達成了趨近 24 小時的待機運作。</p>
+                                <p>為了省下每月 7 美金的背景服務費，我們使用了 Render Web Service 配合外部 Cron Job 工具。定時叫醒服務防止其休眠，這才達成了趨近 24
+                                    小時的待機運作。</p>
                             </div>
 
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
                                 <h5 class="font-bold text-slate-800 mb-1">4. 儲存與流量的現實考量</h5>
-                                <p>原本想提供 MP3 下載，但考量到 Firebase 免費版僅有 5GB 空間與 10GB 每月流量，幾部長篇 Podcast 就會塞爆。因此忍痛捨棄大檔下載，專注於輕量化的分析文本。</p>
+                                <p>原本想提供 MP3 下載，但考量到 Firebase 免費版僅有 5GB 空間與 10GB 每月流量，幾部長篇 Podcast
+                                    就會塞爆。因此忍痛捨棄大檔下載，專注於輕量化的分析文本。</p>
                             </div>
 
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
                                 <h5 class="font-bold text-slate-800 mb-1">5. 與 Gemini API 的版本追逐戰</h5>
-                                <p>模型版本更新頻繁且不穩定。實驗過 <code>latest-flash</code> 塞車、<code>2.5-flash</code> 在雲端炸裂，最後選定 <code>flash-lite-latest</code> 測試是否能提高RPD每日用量。</p>
+                                <p>模型版本更新頻繁且不穩定。實驗過 <code>latest-flash</code> 塞車、<code>2.5-flash</code> 在雲端炸裂，最後選定
+                                    <code>flash-lite-latest</code> 測試是否能提高RPD每日用量。
+                                </p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
+                                <h5 class="font-bold text-slate-800 mb-1">6. 消失的秒數 (Groq 每小時限制)</h5>
+                                <p>Groq 的 Whisper 免費層級每小時僅提供 7,200 秒（120 分鐘）的轉錄額度。分析兩部長篇 Podcast 就會觸發熔斷，免費仔只能吞淚等下一個整點重置。</p>
                             </div>
 
                             <p class="text-xs text-slate-400 text-center italic pt-2">「在預算極限中尋求最優技術方案，是開發者的浪漫（跟痛苦）。」</p>
@@ -287,13 +303,13 @@
 
         // --- Firebase 設定 ---
         const firebaseConfig = {
-            apiKey: "AIzaSyAzLaFvxqYF6SqbMLJ8...", // 填入你真實的 Key
+            apiKey: "AIzaSyDK8b3B9Q41RdLX-wKa_BBbTDjKizf75-w",
             authDomain: "whisge-1683c.firebaseapp.com",
             projectId: "whisge-1683c",
             storageBucket: "whisge-1683c.firebasestorage.app",
-            messagingSenderId: "你的SenderId",
-            appId: "你的AppId",
-            // measurementId 如果沒有可以整行刪掉
+            messagingSenderId: "726503147127",
+            appId: "1:726503147127:web:927ad305113724a3d86872",
+            measurementId: "G-TWY572RJFB"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -311,7 +327,7 @@
             const content = document.getElementById('frugal-content');
             const chevron = document.getElementById('frugal-chevron');
             const isHidden = content.classList.contains('hidden');
-            
+
             content.classList.toggle('hidden');
             chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
         };
@@ -422,14 +438,25 @@
                     let friendlyMsg = "後端處理發生異常，請稍後再試";
 
                     const errorMap = {
-                        "429": "⚠️ 額度已達上限！請等候幾分鐘再試。",
-                        "ASPH": "⚠️ 每小時轉錄時數已滿，請稍後再試。",
-                        "Quota": "⚠️ Google API 次數或字數限制已滿，請等候一分鐘。",
-                        "QuotaFailure": "⚠️ Google API 次數或字數限制已滿，請等候一分鐘。",
-                        "401": "🔑 API 金鑰失效，請聯繫管理員。",
-                        "400": "🚫 連結無效或格式不支援，請再檢查。",
-                        "500": "💣 伺服器忙碌中，請點擊重試。",
-                        "503": "🚧 服務維護中，請稍候再回訪。"
+                        // --- Groq API (逐字稿轉錄) ---
+                        "429": "[Groq] ⚠️ 額度達上限！請等候幾分鐘再試。",
+                        "ASPH": "[Groq] ⚠️ 每小時轉錄時數已達上限，請稍後再試。",
+
+                        // --- Google Gemini (AI 分析) ---
+                        "Quota": "[Gemini] ⚠️ API 次數或字數限制已滿，請等候一分鐘。",
+                        "QuotaFailure": "[Gemini] ⚠️ API 次數或字數限制已滿，請等候一分鐘。",
+
+                        // --- YouTube / 來源檢查 ---
+                        "Sign in to confirm": "[YouTube] 🔑 要求驗證身分，請聯繫管理員更新 Cookie。",
+                        "unavailable": "[YouTube] 🚫 影片目前無法播放 (刪除或地區限制)。",
+                        "400": "[Source] 🚫 連結無效或格式不支援，請再檢查。",
+
+                        // --- 伺服器狀態 (Render / Backend) ---
+                        "memory": "[System] 🔋 伺服器記憶體不足，請稍後再試。",
+                        "timeout": "[System] 🕒 處理時間過長 (影片過長)，請手動重試。",
+                        "500": "[System] 💣 伺服器內部錯誤，請點擊重試。",
+                        "503": "[System] 🚧 服務維護中或超載，請稍候再回訪。",
+                        "401": "[Auth] 🔑 API 金鑰失效或權限不足，請聯繫管理員。"
                     };
 
                     // 尋找匹配的錯誤訊息
