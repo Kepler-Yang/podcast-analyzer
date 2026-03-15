@@ -52,7 +52,7 @@
                     </div>
                     <input type="text" id="sourceUrl"
                         class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="貼上 YouTube 或 Apple Podcast 網址">
+                        placeholder="貼上 YouTube 或 Apple Podcast 網址 (範例: https://youtu.be/...)">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="sendTask()"
@@ -114,7 +114,23 @@
                             <i data-lucide="trending-up" class="mr-2"></i> 核心投資分析
                         </h4>
                         <p id="display-insight"
-                            class="text-slate-600 leading-relaxed text-lg text-justify whitespace-pre-wrap"></p>
+                            class="text-slate-600 leading-relaxed text-lg text-justify whitespace-pre-wrap mb-8"></p>
+
+                        <!-- 新增：個股與族群標籤 -->
+                        <div class="space-y-4 pt-6 border-t border-slate-100">
+                            <div id="section-stocks" class="hidden">
+                                <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center">
+                                    <i data-lucide="tag" class="size-4 mr-2"></i> 提及個股
+                                </h5>
+                                <div id="display-stocks" class="flex flex-wrap gap-2"></div>
+                            </div>
+                            <div id="section-sectors" class="hidden">
+                                <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center">
+                                    <i data-lucide="layers" class="size-4 mr-2"></i> 產業族群
+                                </h5>
+                                <div id="display-sectors" class="flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -254,8 +270,23 @@
 
         // --- 發送任務至後端 ---
         window.sendTask = async () => {
-            const url = document.getElementById('sourceUrl').value.trim();
-            if (!url) return;
+            const urlInput = document.getElementById('sourceUrl').value.trim();
+            if (!urlInput) return;
+
+            // 💡 特殊功能：輸入 TEST 直接顯示模擬資料
+            if (urlInput.toUpperCase() === 'TEST') {
+                runDemoMode();
+                return;
+            }
+
+            // 🔍 基礎網址檢查
+            const isYoutube = urlInput.includes("youtube.com") || urlInput.includes("youtu.be");
+            const isApple = urlInput.includes("podcasts.apple.com");
+
+            if (!isYoutube && !isApple) {
+                alert("❌ 請輸入正確的 YouTube 或 Apple Podcast 連結。\n目前僅支援這兩大平台。");
+                return;
+            }
 
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('content').classList.add('hidden');
@@ -264,16 +295,57 @@
 
             try {
                 const docRef = await addDoc(collection(db, "tasks"), {
-                    url: url,
+                    url: urlInput,
                     status: "pending",
                     timestamp: serverTimestamp()
                 });
-                listenToSpecificResult(docRef.id, url);
+                listenToSpecificResult(docRef.id, urlInput);
             } catch (e) {
                 alert("發送失敗: " + e.message);
                 document.getElementById('loading').classList.add('hidden');
             }
         };
+
+        // 🛠️ 模擬演示模式
+        function runDemoMode() {
+            const testData = {
+                title: "【股癌】GTC 大會與 AI 伺服器供應鏈深度解析 (Demo)",
+                investment_insight: "1. 記憶體市場現況：\n旺宏 (NOR Flash、EMMC) 受惠於 AI 伺服器排擠效應，獲得成長機會，並提及美光毛利傳聞及各廠積極資本支出，顯示產業普遍看好。\n\n2. NVIDIA GTC 展望：\n預期光通訊解決方案 (CPO) 可能成為亮點，並建議投資者在重大事件前審慎調整部位。\n\n3. Tesla 投資警示：\n雖面臨 Robotaxi 質疑，但供應鏈訂單數據預示其潛在爆發力，同時警示其高估值帶來的投資風險。",
+                highlights: [
+                    { timeStart: "00:05:20", desc: "市場戰鬥週與心態調整" },
+                    { timeStart: "00:15:45", desc: "旺宏與記憶體產業受惠細節" },
+                    { timeStart: "00:45:10", desc: "NVIDIA 與光通訊族群觀察" }
+                ],
+                stocks: ["旺宏", "美光", "NVIDIA", "Tesla", "台積電", "鴻海"],
+                sectors: ["CPO", "NOR Flash", "AI伺服器", "光通訊", "Robotaxi", "半導體"],
+                srt_url: "#",
+                timestamp: { toDate: () => new Date() },
+                metadata: {
+                    thumbnail: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/04/b5/eb/04b5ebdf-7072-21fc-5876-e5feb5ba3dac/mza_7653733142335128691.jpeg/300x300bb.webp",
+                    title: "【股癌】GTC大會與AI伺服器供應鏈深度解析",
+                    channel: "Gooaye 股癌",
+                    duration_text: "58:42"
+                }
+            };
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('progress-bar').style.width = "100%";
+            document.getElementById('progress-msg').innerText = "正在載入模擬數據...";
+
+            setTimeout(() => {
+                const infoBox = document.getElementById('pre-info');
+                infoBox.classList.remove('hidden');
+                document.getElementById('pre-thumb').src = testData.metadata.thumbnail;
+                document.getElementById('pre-title').innerText = testData.metadata.title;
+                document.getElementById('pre-channel').innerText = testData.metadata.channel;
+                document.getElementById('pre-duration').innerText = testData.metadata.duration_text;
+
+                updateUI(testData, "https://www.youtube.com/watch?v=cduKfpHDvKY");
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+                document.getElementById('task-status').innerText = "✨ 測試模式載入完成";
+            }, 1000);
+        }
 
         window.clearInput = () => {
             document.getElementById('sourceUrl').value = '';
@@ -361,6 +433,34 @@
             document.getElementById('display-title').innerText = data.title;
             document.getElementById('display-insight').innerText = data.investment_insight;
             if (data.timestamp) document.getElementById('display-date').innerText = data.timestamp.toDate().toLocaleString();
+
+            // 1. 渲染個股名單
+            const stocksEl = document.getElementById('display-stocks');
+            const stocksSection = document.getElementById('section-stocks');
+            if (data.stocks && data.stocks.length > 0) {
+                stocksSection.classList.remove('hidden');
+                stocksEl.innerHTML = data.stocks.map(s => `
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                        # ${s}
+                    </span>
+                `).join('');
+            } else {
+                stocksSection.classList.add('hidden');
+            }
+
+            // 2. 渲染技術族群
+            const sectorsEl = document.getElementById('display-sectors');
+            const sectorsSection = document.getElementById('section-sectors');
+            if (data.sectors && data.sectors.length > 0) {
+                sectorsSection.classList.remove('hidden');
+                sectorsEl.innerHTML = data.sectors.map(s => `
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-purple-50 text-purple-600 border border-purple-100">
+                        <i data-lucide="zap" class="size-3 mr-1"></i> ${s}
+                    </span>
+                `).join('');
+            } else {
+                sectorsSection.classList.add('hidden');
+            }
 
             const highlightsEl = document.getElementById('display-highlights');
             // 💡 加入 || [] 防呆機制，確保不會因為找不到 highlights 而報錯
