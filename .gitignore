@@ -12,3 +12,12 @@ temp*
 __pycache__/
 .env
 venv/
+
+
+# 後端用的, 暫時放一起
+Dockerfile
+firebase_storage.py
+main.py
+processor.py
+requirements.txt
+serviceAccountKey.json
