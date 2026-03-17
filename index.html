@@ -52,7 +52,7 @@
                     </div>
                     <input type="text" id="sourceUrl"
                         class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="貼上 YouTube 或 Apple Podcast 網址 (範例: https://youtu.be/...)">
+                        placeholder="貼上 Apple Podcast 網址 (目前 YouTube 功能維護中)">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="sendTask()"
@@ -244,7 +244,12 @@
                         <div id="frugal-content"
                             class="hidden mt-4 space-y-4 px-4 pb-4 text-sm text-slate-600 leading-relaxed">
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">1. 突破 Groq 25MB 限制</h5>
+                                <h5 class="font-bold text-slate-800 mb-1">1. YouTube 雲端禁令 (最沉痛的教訓)</h5>
+                                <p>在本地測試時 <code>yt-dlp</code> 運行得非常完美。但一旦部署至 Render 這種資料中心環境，YouTube 便會祭出最嚴厲的 IP 驗證，直接判定為機器人下載。在社群爬文與實驗無數種 Cookie 與 PO Token 解法後，考量到維護成本與雲端隱私安全，最終決定在雲端版暫時宣告放棄。</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
+                                <h5 class="font-bold text-slate-800 mb-1">2. 突破 Groq 25MB 限制</h5>
                                 <p>Groq Whisper API 強制要求音檔在 25MB 以下。開發中花了大量時間研究 <code>yt-dlp</code>
                                     參數，依據影片時長動態計算傳輸位元率，力求在不失真的情況下精準壓在 24.9MB 跳舞。</p>
                             </div>
@@ -345,12 +350,17 @@
                 return;
             }
 
-            // 🔍 基礎網址檢查
+            // 🔍 基礎網址檢查 (暫時封鎖 YouTube)
             const isYoutube = urlInput.includes("youtube.com") || urlInput.includes("youtu.be");
             const isApple = urlInput.includes("podcasts.apple.com");
 
-            if (!isYoutube && !isApple) {
-                alert("❌ 請輸入正確的 YouTube 或 Apple Podcast 連結。\n目前僅支援這兩大平台。");
+            if (isYoutube) {
+                alert("⚠️ YouTube 分析功能維護中\n\n因受限於雲端環境 IP 驗證，目前暫時無法解析 YouTube 連結。\n\n💡 建議：改用 Apple Podcast 網址執行分析，穩定性更佳！");
+                return;
+            }
+
+            if (!isApple) {
+                alert("❌ 請輸入正確的 Apple Podcast 連結。\n目前僅支援此平台。");
                 return;
             }
 
@@ -542,29 +552,12 @@
             const highlightsEl = document.getElementById('display-highlights');
             // 💡 加入 || [] 防呆機制，確保不會因為找不到 highlights 而報錯
             highlightsEl.innerHTML = (data.highlights || []).map(h => {
-                let jumpUrl = "#";
-                if (originalUrl.includes("youtube.com") || originalUrl.includes("youtu.be")) {
-                    const parts = h.timeStart.split(':');
-                    let seconds = 0;
-
-                    // 💡 修復時間換算 Bug：動態判斷是 hh:mm:ss 還是 mm:ss
-                    if (parts.length === 3) {
-                        seconds = (+parts[0]) * 3600 + (+parts[1]) * 60 + (+parts[2]);
-                    } else if (parts.length === 2) {
-                        seconds = (+parts[0]) * 60 + (+parts[1]);
-                    }
-
-                    const videoIdMatch = originalUrl.match(/(?:\?v=|\/embed\/|\/watch\?v=|\/v\/|\/u\/\w\/|youtu\.be\/|shorts\/)([^#&?]*).*/);
-                    const videoId = videoIdMatch ? videoIdMatch[1] : "";
-                    jumpUrl = `https://www.youtube.com/watch?v=${videoId}&t=${seconds}s`;
-                }
-
                 return `
                 <div class="group relative border-l-2 border-slate-100 pl-6 pb-2">
                     <div class="absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-white bg-slate-200"></div>
-                    <a href="${jumpUrl}" target="_blank" class="text-xs font-mono font-bold text-blue-500 mb-1 hover:underline flex items-center">
+                    <div class="text-xs font-mono font-bold text-blue-500 mb-1 flex items-center">
                         <i data-lucide="play-circle" class="size-3 mr-1"></i> ${h.timeStart}
-                    </a>
+                    </div>
                     <p class="text-slate-800 font-bold text-base">${h.desc}</p>
                 </div>`;
             }).join('');
