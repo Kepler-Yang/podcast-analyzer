@@ -52,7 +52,7 @@
                     </div>
                     <input type="text" id="sourceUrl"
                         class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="貼上 Apple Podcast 網址 (目前 YouTube 功能維護中)">
+                        placeholder="貼上 Apple Podcast 網址 (https://podcasts.apple.com/...), 或輸入 TEST 預覽結果">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="sendTask()"
@@ -416,7 +416,7 @@
                 document.getElementById('pre-channel').innerText = testData.metadata.channel;
                 document.getElementById('pre-duration').innerText = testData.metadata.duration_text;
 
-                updateUI(testData, "https://www.youtube.com/watch?v=cduKfpHDvKY");
+                updateUI(testData, "https://podcasts.apple.com/tw/podcast/ep644/id1500839292?i=1000755239861");
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
                 document.getElementById('task-status').innerText = "✨ 測試模式載入完成";
