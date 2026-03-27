@@ -1,0 +1,17 @@
+# --- Firebase 與 Backend 執行需求 ---
+firebase-admin==7.2.0
+google-cloud-firestore==2.25.0
+flask==3.1.0
+
+# --- 下載與環境工具 ---
+yt-dlp>=2024.03.00
+python-dotenv==1.0.1
+
+# --- 語言模型 (Google Gemini) ---
+google-genai==1.66.0
+
+# --- OpenAI Whisper 轉錄工具 ---
+# 👉 請先手動安裝您的顯卡對應版本 PyTorch，才能發揮 GPU 效能！
+# 如: pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 (或是 cu121)
+# 確保 PyTorch 支援 Cuda 之後，再安裝 openai-whisper：
+openai-whisper

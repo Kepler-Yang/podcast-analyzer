@@ -19,15 +19,15 @@
 <body class="bg-gray-50 min-h-screen flex flex-col">
 
     <!-- 導航欄 -->
-    <nav class="bg-slate-900 text-white py-6 shadow-lg border-b-4 border-blue-600">
+    <nav class="bg-slate-900 text-white py-6 shadow-lg border-b-4 border-emerald-600">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold flex items-center">
-                <i data-lucide="bar-chart-3" class="mr-2 text-blue-400"></i>
-                AI Podcast 分析助手
+                <i data-lucide="zap" class="mr-2 text-emerald-400"></i>
+                AI Podcast 分析助手(本地版)
             </h1>
             <div class="flex items-center gap-6">
                 <button onclick="toggleModal()"
-                    class="text-sm font-medium text-blue-400 hover:text-blue-300 flex items-center transition-colors">
+                    class="text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center transition-colors">
                     <i data-lucide="info" class="size-4 mr-1"></i> 運作架構
                 </button>
                 <div id="status-indicator" class="flex items-center text-sm text-slate-400">
@@ -51,12 +51,12 @@
                         <i data-lucide="link" class="text-slate-400 size-5"></i>
                     </div>
                     <input type="text" id="sourceUrl"
-                        class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="貼上 Apple Podcast 網址 (https://podcasts.apple.com/...), 或輸入 TEST 預覽結果">
+                        class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+                        placeholder="貼上 Apple Podcast 或 YouTube 網址, 或輸入 TEST 預覽結果">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="sendTask()"
-                        class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-colors min-w-[140px]">
+                        class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-bold rounded-xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none transition-colors min-w-[140px]">
                         <i data-lucide="play" class="mr-2 size-5"></i> 執行分析
                     </button>
                     <button onclick="clearInput()"
@@ -77,11 +77,11 @@
                 <h4 id="pre-title" class="font-bold text-slate-800 text-lg leading-tight mb-2">正在讀取影片資訊...</h4>
                 <div class="flex flex-wrap gap-4 text-sm">
                     <span id="pre-channel-wrap" class="flex items-center text-slate-600">
-                        <i data-lucide="user" class="size-4 mr-1 text-blue-500"></i>
+                        <i data-lucide="user" class="size-4 mr-1 text-emerald-500"></i>
                         <span id="pre-channel"></span>
                     </span>
                     <span id="pre-duration-wrap" class="flex items-center text-slate-600">
-                        <i data-lucide="clock" class="size-4 mr-1 text-blue-500"></i>
+                        <i data-lucide="clock" class="size-4 mr-1 text-emerald-500"></i>
                         <span id="pre-duration"></span>
                     </span>
                 </div>
@@ -90,12 +90,12 @@
 
         <!-- 載入中狀態 (僅在發送任務後顯示) -->
         <div id="loading" class="hidden flex flex-col items-center justify-center py-10">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-6"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-6"></div>
             <p id="progress-msg" class="text-slate-500 font-bold mb-4">後端正在認領任務...</p>
 
             <!-- 動態進度條 -->
             <div class="w-full max-w-xs h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div id="progress-bar" class="h-full bg-blue-600 transition-all duration-500" style="width: 0%"></div>
+                <div id="progress-bar" class="h-full bg-emerald-600 transition-all duration-500" style="width: 0%"></div>
             </div>
         </div>
 
@@ -105,12 +105,12 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                     <div class="flex items-center justify-between mb-6">
                         <span
-                            class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">最新分析紀錄</span>
+                            class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">最新分析紀錄</span>
                         <span id="display-date" class="text-slate-400 text-sm"></span>
                     </div>
                     <h2 id="display-title" class="text-3xl font-bold text-slate-900 mb-6 leading-tight"></h2>
                     <div class="prose prose-slate max-w-none">
-                        <h4 class="flex items-center text-blue-600 font-bold mb-4">
+                        <h4 class="flex items-center text-emerald-600 font-bold mb-4">
                             <i data-lucide="trending-up" class="mr-2"></i> 核心投資分析
                         </h4>
                         <p id="display-insight"
@@ -140,20 +140,26 @@
             <div class="lg:col-span-5 space-y-8">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                     <h4 class="flex items-center text-slate-900 font-bold mb-6">
-                        <i data-lucide="list-video" class="mr-2 text-blue-600"></i> 精彩亮點
+                        <i data-lucide="list-video" class="mr-2 text-emerald-600"></i> 精彩亮點
                     </h4>
                     <div id="display-highlights" class="space-y-6"></div>
                 </div>
 
                 <div class="bg-slate-900 rounded-2xl shadow-sm p-8 text-white">
                     <h4 class="flex items-center font-bold mb-6">
-                        <i data-lucide="download" class="mr-2 text-blue-400"></i> 資源下載
+                        <i data-lucide="download" class="mr-2 text-emerald-400"></i> 資源下載
                     </h4>
                     <div class="grid grid-cols-1 gap-4">
                         <a id="download-srt" href="#" target="_blank"
                             class="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors p-4 rounded-xl border border-white/10">
                             <span class="flex items-center"><i data-lucide="file-text" class="mr-3"></i> 逐字稿
                                 (.srt)</span>
+                            <i data-lucide="external-link" class="size-4 opacity-50"></i>
+                        </a>
+                        <a id="download-json" href="#" target="_blank"
+                            class="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors p-4 rounded-xl border border-white/10">
+                            <span class="flex items-center"><i data-lucide="code" class="mr-3"></i> 分析結果
+                                (.json)</span>
                             <i data-lucide="external-link" class="size-4 opacity-50"></i>
                         </a>
                         <a id="source-link" href="#" target="_blank"
@@ -174,23 +180,22 @@
         <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <h3 class="text-xl font-bold flex items-center text-slate-800">
-                    <i data-lucide="network" class="mr-2 text-blue-600"></i> 系統運作架構說明
+                    <i data-lucide="network" class="mr-2 text-emerald-600"></i> 系統運作架構說明
                 </h3>
                 <button onclick="toggleModal()" class="text-slate-400 hover:text-slate-600 focus:outline-none">
                     <i data-lucide="x" class="size-6"></i>
                 </button>
             </div>
-            <div class="px-6 py-6 overflow-y-auto prose prose-slate prose-blue max-w-none">
-                <p class="text-slate-600 mb-6">這是一個經典且無伺服器（Serverless）架構的「非同步任務處理」流程，包含了五個主要階段：</p>
+            <div class="px-6 py-6 overflow-y-auto prose prose-slate prose-emerald max-w-none">
+                <p class="text-slate-600 mb-6">這是一個完全採用本地 GPU 加速引擎的「非同步任務處理」流程，包含了五個主要階段：</p>
 
                 <div class="space-y-6">
-                    <div class="border-l-4 border-blue-500 pl-4">
+                    <div class="border-l-4 border-emerald-500 pl-4">
                         <h4 class="font-bold flex items-center text-lg m-0"><span
-                                class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">1</span>
+                                class="bg-emerald-100 text-emerald-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">1</span>
                             前端發起請求 (HTML / GitHub Pages)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">使用者在畫面輸入網址後，JavaScript 將任務寫入
-                            <strong>Firebase</strong> 的 <code>tasks</code> 集合（狀態 <code>pending</code>），並獲得專屬
-                            <code>taskId</code>。前端隨即進入等待狀態，同時監聽回傳結果。
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">使用者輸入網址後，JavaScript 將帶有暗號的任務寫入
+                            <strong>Firebase</strong> 的 <code>tasks</code> 集合（狀態設定為 <code>pending_local</code>），防止雲端伺服器搶單。
                         </p>
                     </div>
 
@@ -205,10 +210,8 @@
                     <div class="border-l-4 border-purple-500 pl-4">
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">3</span>
-                            後端運算引擎 (Python Processor)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">後端系統定時檢查 Firebase。一旦發現
-                            <code>pending</code> 任務便標記為 <code>processing</code>，接著執行下載音檔 ➔ Whisper 轉錄 ➔ Gemini AI
-                            總結分析的高強度運算。
+                            後端運算引擎 (Local 本機端 GPU)</h4>
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">您本機的 Python 伺服器發現 <code>pending_local</code> 任務後，便會無視一切檔案大小限制，透過 yt-dlp 暴力下載，接著調用本地顯示卡的 CUDA 算力給 OpenAI Whisper 轉錄 ➔ 最後交由 Gemini AI 產出高純度分析。
                         </p>
                     </div>
 
@@ -216,76 +219,16 @@
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-green-100 text-green-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">4</span>
                             雲端儲存 (Firebase Storage)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">後端運算完成後，將生成的逐字稿 (<code>.srt</code>)
-                            備份儲存到 Firebase Storage 之中，並產生專屬的下載連結。</p>
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">運算完成後，生成的逐字稿 (<code>.srt</code>)
+                            與結果會被備份儲存至 Firebase Storage 之中，並產生專屬連結供您隨時調閱下載。</p>
                     </div>
 
-                    <div class="border-l-4 border-blue-500 pl-4">
+                    <div class="border-l-4 border-emerald-500 pl-4">
                         <h4 class="font-bold flex items-center text-lg m-0"><span
-                                class="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">5</span>
+                                class="bg-emerald-100 text-emerald-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">5</span>
                             結果回傳前端 (Firebase -> HTML)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">後端將 AI 分析結果、Storage 下載連結連同原本的
-                            <code>taskId</code> 寫回 Firebase。Firebase 察覺後立刻發送推播給等待中的前端 HTML，網頁隨即解除轉圈圈狀態這整份結果渲染至畫面。
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">本地腳本將最後的分析結果寫回 Firebase。此時網頁的監聽器立刻捕捉到變動，隨即渲染這份來自本地硬體的心血結晶給您！
                         </p>
-                    </div>
-
-                    <!-- 新增：免費仔的開發辛酸血淚 (摺疊區塊) -->
-                    <div class="mt-8 pt-6 border-t border-slate-100">
-                        <button onclick="toggleFrugalSection()"
-                            class="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors group">
-                            <span class="font-bold text-orange-700 flex items-center">
-                                <i data-lucide="ghost" class="mr-2 size-5"></i>
-                                開發者的辛酸血淚：如何挑戰「零成本」極限？
-                            </span>
-                            <i id="frugal-chevron" data-lucide="chevron-down"
-                                class="text-orange-400 group-hover:text-orange-600 transition-transform"></i>
-                        </button>
-
-                        <div id="frugal-content"
-                            class="hidden mt-4 space-y-4 px-4 pb-4 text-sm text-slate-600 leading-relaxed">
-                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">1. YouTube 雲端禁令 (最沉痛的教訓)</h5>
-                                <p>在本地測試時 <code>yt-dlp</code> 運行得非常完美。但一旦部署至 Render 這種資料中心環境，YouTube 便會祭出最嚴厲的 IP 驗證，直接判定為機器人下載。在社群爬文與實驗無數種 Cookie 與 PO Token 解法後，考量到維護成本與雲端隱私安全，最終決定在雲端版暫時宣告放棄。</p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">2. 突破 Groq 25MB 限制</h5>
-                                <p>Groq Whisper API 強制要求音檔在 25MB 以下。開發中花了大量時間研究 <code>yt-dlp</code>
-                                    參數，依據影片時長動態計算傳輸位元率，力求在不失真的情況下精準壓在 24.9MB 跳舞。</p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">3. 雙重壓縮防線 (FFmpeg)</h5>
-                                <p>為了防止下載器失控，緊急追加了 <code>FFmpeg</code> 二次強制壓縮功能。雖然 Render 的免費 CPU 運算緩慢，但這是確保任務不被 API
-                                    彈回的最後一道保險。</p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">4. Render 的「生存防護」技巧</h5>
-                                <p>為了省下每月 7 美金的背景服務費，我們使用了 Render Web Service 配合外部 Cron Job 工具。定時叫醒服務防止其休眠，這才達成了趨近 24
-                                    小時的待機運作。</p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">5. 儲存與流量的現實考量</h5>
-                                <p>原本想提供 MP3 下載，但考量到 Firebase 免費版僅有 5GB 空間與 10GB 每月流量，幾部長篇 Podcast
-                                    就會塞爆。因此忍痛捨棄大檔下載，專注於輕量化的分析文本。</p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">6. 與 Gemini API 的版本追逐戰</h5>
-                                <p>模型版本更新頻繁且不穩定。實驗過 <code>latest-flash</code> 塞車、<code>2.5-flash</code> 在雲端炸裂，最後選定
-                                    <code>flash-lite-latest</code> 測試是否能提高RPD每日用量。
-                                </p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
-                                <h5 class="font-bold text-slate-800 mb-1">7. 消失的秒數 (Groq 每小時限制)</h5>
-                                <p>Groq 的 Whisper 免費層級每小時僅提供 7,200 秒（120 分鐘）的轉錄額度。分析兩部長篇 Podcast 就會觸發熔斷，免費仔只能吞淚等下一個整點重置。</p>
-                            </div>
-
-                            <p class="text-xs text-slate-400 text-center italic pt-2">「在預算極限中尋求最優技術方案，是開發者的浪漫（跟痛苦）。」</p>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -354,13 +297,8 @@
             const isYoutube = urlInput.includes("youtube.com") || urlInput.includes("youtu.be");
             const isApple = urlInput.includes("podcasts.apple.com");
 
-            if (isYoutube) {
-                alert("⚠️ YouTube 分析功能維護中\n\n因受限於雲端環境 IP 驗證，目前暫時無法解析 YouTube 連結。\n\n💡 建議：改用 Apple Podcast 網址執行分析，穩定性更佳！");
-                return;
-            }
-
-            if (!isApple) {
-                alert("❌ 請輸入正確的 Apple Podcast 連結。\n目前僅支援此平台。");
+            if (!isApple && !isYoutube) {
+                alert("❌ 請輸入正確的 Apple Podcast 或 YouTube 連結。\n目前僅支援這兩個平台。");
                 return;
             }
 
@@ -372,7 +310,7 @@
             try {
                 const docRef = await addDoc(collection(db, "tasks"), {
                     url: urlInput,
-                    status: "pending",
+                    status: "pending_local",
                     timestamp: serverTimestamp()
                 });
                 listenToSpecificResult(docRef.id, urlInput);
@@ -564,6 +502,7 @@
 
             // 資源下載與連結
             document.getElementById('download-srt').href = data.srt_url;
+            document.getElementById('download-json').href = data.json_url || "#";
             document.getElementById('source-link').href = originalUrl;
 
             lucide.createIcons();
