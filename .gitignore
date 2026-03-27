@@ -14,10 +14,7 @@ __pycache__/
 venv/
 
 
-# 後端用的, 暫時放一起
-Dockerfile
+# 後端用的, 本地運行不需要
 firebase_storage.py
 main.py
 processor.py
-requirements.txt
-serviceAccountKey.json
