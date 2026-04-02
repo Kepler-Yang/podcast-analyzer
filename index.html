@@ -71,6 +71,7 @@
         <!-- 全局影片預覽卡片 (顯示在輸入框下方，載入與結果區上方) -->
         <div id="pre-info"
             class="hidden w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-md border mb-8 p-5 flex items-center gap-6">
+            <!-- 用hidden做隱藏，有偵查到 metadata 才顯示, 包含thumbnail, title, channel, duration -->
             <img id="pre-thumb" src=""
                 class="w-32 h-32 object-cover rounded-xl shadow-inner bg-slate-100 flex-shrink-0">
             <div class="flex-grow">
@@ -245,7 +246,8 @@
                             class="hidden mt-4 space-y-4 px-4 pb-4 text-sm text-slate-600 leading-relaxed">
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
                                 <h5 class="font-bold text-slate-800 mb-1">1. YouTube 雲端禁令 (最沉痛的教訓)</h5>
-                                <p>在本地測試時 <code>yt-dlp</code> 運行得非常完美。但一旦部署至 Render 這種資料中心環境，YouTube 便會祭出最嚴厲的 IP 驗證，直接判定為機器人下載。在社群爬文與實驗無數種 Cookie 與 PO Token 解法後，考量到維護成本與雲端隱私安全，最終決定在雲端版暫時宣告放棄。</p>
+                                <p>在本地測試時 <code>yt-dlp</code> 運行得非常完美。但一旦部署至 Render 這種資料中心環境，YouTube 便會祭出最嚴厲的 IP
+                                    驗證，直接判定為機器人下載。在社群爬文與實驗無數種 Cookie 與 PO Token 解法後，考量到維護成本與雲端隱私安全，最終決定在雲端版暫時宣告放棄。</p>
                             </div>
 
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
@@ -281,7 +283,8 @@
 
                             <div class="bg-white p-4 rounded-lg border border-orange-100 shadow-sm">
                                 <h5 class="font-bold text-slate-800 mb-1">7. 消失的秒數 (Groq 每小時限制)</h5>
-                                <p>Groq 的 Whisper 免費層級每小時僅提供 7,200 秒（120 分鐘）的轉錄額度。分析兩部長篇 Podcast 就會觸發熔斷，免費仔只能吞淚等下一個整點重置。</p>
+                                <p>Groq 的 Whisper 免費層級每小時僅提供 7,200 秒（120 分鐘）的轉錄額度。分析兩部長篇 Podcast 就會觸發熔斷，免費仔只能吞淚等下一個整點重置。
+                                </p>
                             </div>
 
                             <p class="text-xs text-slate-400 text-center italic pt-2">「在預算極限中尋求最優技術方案，是開發者的浪漫（跟痛苦）。」</p>
@@ -371,9 +374,9 @@
 
             try {
                 const docRef = await addDoc(collection(db, "tasks"), {
-                    url: urlInput,
-                    status: "pending",
-                    timestamp: serverTimestamp()
+                    url: urlInput, // 使用者輸入的網址
+                    status: "pending",  // 標記為「待處理」，讓後端知道有新活要幹
+                    timestamp: serverTimestamp()  // 記錄時間
                 });
                 listenToSpecificResult(docRef.id, urlInput);
             } catch (e) {
@@ -435,7 +438,7 @@
             document.getElementById('progress-bar').style.width = "0%";
             document.getElementById('pre-info').classList.add('hidden');
 
-            // ⚡ A. 監聽任務過程 (進度條、預覽資訊)
+            // ⚡ A. 監聽任務過程 (進度條、預覽資訊) (使用'onSnapshot', 避免超時問題)
             const taskSub = onSnapshot(doc(db, "tasks", taskId), (docSnap) => {
                 if (!docSnap.exists()) return;
                 const data = docSnap.data();
@@ -487,7 +490,7 @@
 
                 if (data.metadata) {
                     const infoBox = document.getElementById('pre-info');
-                    infoBox.classList.remove('hidden');
+                    infoBox.classList.remove('hidden');  // 移除 hidden 屬性，顯示預覽卡片. 下面innerText填入metadata內容
                     document.getElementById('pre-thumb').src = data.metadata.thumbnail;
                     document.getElementById('pre-title').innerText = data.metadata.title;
                     document.getElementById('pre-channel').innerText = data.metadata.channel;
@@ -502,7 +505,7 @@
                 if (snapshot.empty) return;
                 const data = snapshot.docs[0].data();
 
-                updateUI(data, originalUrl);
+                updateUI(data, originalUrl);  // 拿到資料後更新畫面
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
