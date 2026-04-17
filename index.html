@@ -349,10 +349,7 @@
                 }
 
                 const data = snapshot.data();
-                if (!data.last_seen) {
-                    setOffline();
-                    return;
-                }
+                if (!data || !data.last_seen) return; // 等待伺服器回傳時間
 
                 // 判斷是否在 60 秒內有更新 (後端每 30 秒更新一次)
                 const lastSeen = data.last_seen.toDate().getTime();
@@ -361,21 +358,15 @@
 
                 if (diffSec < 60) {
                     statusText.innerText = "雲端服務已連線";
-                    statusText.classList.remove('text-slate-400', 'text-red-400', 'text-orange-400');
-                    statusText.classList.add('text-blue-400'); // 雲端用藍色
-                    pingPulse.classList.replace('bg-orange-400', 'bg-green-400');
-                    pingPulse.classList.replace('bg-red-400', 'bg-green-400');
-                    pingLed.classList.replace('bg-orange-500', 'bg-green-500');
-                    pingLed.classList.replace('bg-red-500', 'bg-green-500');
+                    statusText.className = "text-blue-400";
+                    pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
+                    pingLed.className = "relative inline-flex rounded-full h-3 w-3 bg-green-500";
                 } else if (diffSec < 300) {
                     // 如果 5 分鐘內有看過，可能正在啟動中 (Render 喚醒中)
                     statusText.innerText = "雲端服務喚醒中...";
-                    statusText.classList.remove('text-slate-400', 'text-blue-400', 'text-red-400');
-                    statusText.classList.add('text-orange-400');
-                    pingPulse.classList.replace('bg-green-400', 'bg-orange-400');
-                    pingPulse.classList.replace('bg-red-400', 'bg-orange-400');
-                    pingLed.classList.replace('bg-green-500', 'bg-orange-500');
-                    pingLed.classList.replace('bg-red-500', 'bg-orange-500');
+                    statusText.className = "text-orange-400";
+                    pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75";
+                    pingLed.className = "relative inline-flex rounded-full h-3 w-3 bg-orange-500";
                 } else {
                     setOffline();
                 }
@@ -383,12 +374,9 @@
 
             function setOffline() {
                 statusText.innerText = "雲端服務休眠中";
-                statusText.classList.remove('text-slate-400', 'text-blue-400', 'text-orange-400');
-                statusText.classList.add('text-red-400');
-                pingPulse.classList.remove('bg-green-400', 'bg-orange-400');
-                pingPulse.classList.add('bg-red-400');
-                pingLed.classList.remove('bg-green-500', 'bg-orange-500');
-                pingLed.classList.add('bg-red-500');
+                statusText.className = "text-red-400";
+                pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
+                pingLed.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
             }
         };
 

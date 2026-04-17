@@ -276,44 +276,48 @@
             const pingPulse = document.getElementById('ping-pulse');
             const pingLed = document.getElementById('ping-led');
 
+            console.log("📡 正在嘗試連線到 Firestore 狀態監聽器...");
+
             onSnapshot(doc(db, "system_status", "local_engine"), (snapshot) => {
+                console.log("📥 收到狀態更新！");
                 if (!snapshot.exists()) {
+                    console.warn("⚠️ 找不不到 system_status/local_engine 文件");
                     setOffline();
                     return;
                 }
 
                 const data = snapshot.data();
-                if (!data.last_seen) {
-                    setOffline();
+                if (!data || !data.last_seen) {
+                    console.log("⏳ 等待伺服器確認時間戳記...");
                     return;
                 }
 
-                // 判斷是否在 60 秒內有更新 (後端每 30 秒更新一次)
+                // 判斷是否在 60 秒內有更新
                 const lastSeen = data.last_seen.toDate().getTime();
                 const now = new Date().getTime();
                 const diffSec = (now - lastSeen) / 1000;
 
+                console.log(`⏱️ 最後在線時間: ${diffSec.toFixed(1)} 秒前`);
+
                 if (diffSec < 60) {
                     statusText.innerText = "本地後端已連線";
-                    statusText.classList.remove('text-slate-400', 'text-red-400');
-                    statusText.classList.add('text-emerald-400');
-                    pingPulse.classList.replace('bg-orange-400', 'bg-green-400');
-                    pingPulse.classList.replace('bg-red-400', 'bg-green-400');
-                    pingLed.classList.replace('bg-orange-500', 'bg-green-500');
-                    pingLed.classList.replace('bg-red-500', 'bg-green-500');
+                    statusText.className = "text-emerald-400";
+                    pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
+                    pingLed.className = "relative inline-flex rounded-full h-3 w-3 bg-green-500";
                 } else {
                     setOffline();
                 }
+            }, (error) => {
+                console.error("❌ Firestore 監聽報錯:", error);
+                statusText.innerText = "連線檢查失敗 (權限 Error)";
+                statusText.className = "text-red-400";
             });
 
             function setOffline() {
                 statusText.innerText = "本地後端未啟動";
-                statusText.classList.remove('text-slate-400', 'text-emerald-400');
-                statusText.classList.add('text-red-400');
-                pingPulse.classList.remove('bg-green-400', 'bg-orange-400');
-                pingPulse.classList.add('bg-red-400');
-                pingLed.classList.remove('bg-green-500', 'bg-orange-500');
-                pingLed.classList.add('bg-red-500');
+                statusText.className = "text-red-400";
+                pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
+                pingLed.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
             }
         };
 
