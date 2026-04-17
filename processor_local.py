@@ -26,10 +26,10 @@ GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
 # 載入原生 Whisper 模型 (與 run_whisper_v2.py 相同機制)
 WHISPER_MODEL_SIZE = "base"
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"📥 正在載入 OpenAI Whisper 模型 ({WHISPER_MODEL_SIZE}) 於 {device} (將使用 {'GPU' if device == 'cuda' else 'CPU'})...")
+print(
+    f"📥 正在載入 OpenAI Whisper 模型 ({WHISPER_MODEL_SIZE}) 於 {device} (將使用 {'GPU' if device == 'cuda' else 'CPU'})..."
+)
 whisper_model = whisper.load_model(WHISPER_MODEL_SIZE, device=device)
-# **GEMINI_MODEL 鎖定**：除非 USER 提出，否則禁止修改此參數。
-GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
 
 
 # ==========================================
@@ -179,21 +179,33 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
         # ⚡ 1.2 執行「字幕優先攔截」 (僅限 YouTube)
         has_existing_subs = False
         if not ("apple.com" in url):
-            update_task_status("📡 正在嘗試抓取 YouTube 既有字幕 (可節省 90% 處理時間)...", 20)
+            update_task_status(
+                "📡 正在嘗試抓取 YouTube 既有字幕 (可節省 90% 處理時間)...", 20
+            )
             try:
                 # 擴充語言包容量，不再限制嚴格檔名
-                with yt_dlp.YoutubeDL({
-                    "skip_download": True,
-                    "writesubtitles": True,
-                    "writeautomaticsub": True,
-                    "subtitleslangs": ["zh-Hant", "zh-TW", "zh-HK", "zh-Hans", "zh"],
-                    "outtmpl": os.path.join(temp_dir, "yt_sub.%(ext)s"),
-                    "postprocessors": [{"key": "FFmpegSubtitlesConvertor", "format": "srt"}],
-                    "quiet": True,
-                    "nocheckcertificate": True,
-                }) as ydl_s:
+                with yt_dlp.YoutubeDL(
+                    {
+                        "skip_download": True,
+                        "writesubtitles": True,
+                        "writeautomaticsub": True,
+                        "subtitleslangs": [
+                            "zh-Hant",
+                            "zh-TW",
+                            "zh-HK",
+                            "zh-Hans",
+                            "zh",
+                        ],
+                        "outtmpl": os.path.join(temp_dir, "yt_sub.%(ext)s"),
+                        "postprocessors": [
+                            {"key": "FFmpegSubtitlesConvertor", "format": "srt"}
+                        ],
+                        "quiet": True,
+                        "nocheckcertificate": True,
+                    }
+                ) as ydl_s:
                     ydl_s.download([url])
-                
+
                 # 放寬掃描：任何含有 yt_sub 的 .srt 或 .vtt 都收
                 for f in os.listdir(temp_dir):
                     if (f.endswith(".srt") or f.endswith(".vtt")) and "yt_sub" in f:
@@ -223,7 +235,9 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
             final_audio = os.path.join(temp_dir, f)
             file_size_mb = os.path.getsize(final_audio) / (1024 * 1024)
             print(f"🎯 偵測到本地快取音檔: {f} ({file_size_mb:.2f} MB)，跳過下載步驟！")
-            update_task_status(f"🎯 偵測到本地快取音檔 ({file_size_mb:.1f}MB)，跳過下載！", 50)
+            update_task_status(
+                f"🎯 偵測到本地快取音檔 ({file_size_mb:.1f}MB)，跳過下載！", 50
+            )
             break
 
     is_apple_podcast = "apple.com" in url
@@ -245,7 +259,7 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
             audio_url,
             "-vn",
             "-acodec",
-            "copy",   # 直接複製，不轉碼 (避免 libopus 不存在的問題)
+            "copy",  # 直接複製，不轉碼 (避免 libopus 不存在的問題)
             "-y",
             final_audio,
         ]
@@ -254,10 +268,14 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
     # [策略 B] Youtube 與其他平台：原生 yt-dlp 強制下載
     if not final_audio and not has_existing_subs:
         mins = int(duration_sec // 60)
-        update_task_status(f"📥 [2/5] 正在提取音訊 ({mins}分鐘)... (預計需 1~2 分鐘)", 30)
-        
+        update_task_status(
+            f"📥 [2/5] 正在提取音訊 ({mins}分鐘)... (預計需 1~2 分鐘)", 30
+        )
+
         # 模仿 test_processor.py 確保優先獲取 m4a 並節省空間
-        format_spec = f"bestaudio[abr<={safe_abr}][ext=m4a]/bestaudio[abr<={safe_abr}]/worstaudio"
+        format_spec = (
+            f"bestaudio[abr<={safe_abr}][ext=m4a]/bestaudio[abr<={safe_abr}]/worstaudio"
+        )
 
         ydl_opts = {
             "format": format_spec,
@@ -265,7 +283,9 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
             "quiet": True,
             "no_warnings": True,
             "nocheckcertificate": True,
-            "cookiefile": cookie_path if (cookie_path and os.path.exists(cookie_path)) else None
+            "cookiefile": (
+                cookie_path if (cookie_path and os.path.exists(cookie_path)) else None
+            ),
         }
 
         try:
@@ -277,7 +297,9 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
             error_msg = str(e).lower()
             if "cookie" in error_msg or "sign in" in error_msg or "bot" in error_msg:
                 print("⚠️ 需要身分驗證，嘗試掛載手機 UA 進行重試...")
-                ydl_opts["user_agent"] = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
+                ydl_opts["user_agent"] = (
+                    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
+                )
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     download_info = ydl.extract_info(url, download=True)
                     raw_file = ydl.prepare_filename(download_info)
@@ -287,7 +309,7 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
         # 由於本地端 Whisper 不受外部 API 的檔案大小限制，我們直接跳過任何轉碼壓縮手續！
         file_size_mb = os.path.getsize(raw_file) / (1024 * 1024)
         print(f"⚖️ 音軌下載完成，大小：{file_size_mb:.2f} MB")
-        
+
         print("⚡ 本地端不限檔案大小，原始檔案直接交付轉錄。")
         final_audio = raw_file
 
@@ -297,15 +319,18 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
         with open(local_srt, "r", encoding="utf-8") as f:
             trans_srt = f.read()
     else:
-        update_task_status("🚀 [3/5] 本地 Whisper 正在轉錄逐字稿... (運算時間視電腦效能而定)", 66)
-        
+        update_task_status(
+            "🚀 [3/5] 本地 Whisper 正在轉錄逐字稿... (運算時間視電腦效能而定, 預估5~10分鐘)",
+            66,
+        )
+
         # 依照 run_whisper_v2.py 呼叫原生 transcribe
         result = whisper_model.transcribe(
-            final_audio, 
+            final_audio,
             language="zh",
             initial_prompt="以下是繁體中文的逐字稿，包含台灣慣用語，請確保輸出為繁體中文。",
             fp16=True if device == "cuda" else False,
-            verbose=False
+            verbose=False,
         )
 
         srt_lines = []
@@ -313,7 +338,7 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
             srt_lines.append(
                 f"{i}\n{format_time(seg['start'])} --> {format_time(seg['end'])}\n{seg['text'].strip()}\n"
             )
-        
+
         trans_srt = "\n".join(srt_lines)
         with open(local_srt, "w", encoding="utf-8") as f:
             f.write(trans_srt)
@@ -336,6 +361,7 @@ def run_gemini_analysis(srt_content, output_json_path, task_id=None, db=None):
     :param db: Firestore client (用於更新進度，可選)
     :return: 分析結果 dict
     """
+
     def update_status(msg, progress):
         print(f"🗳️ [{progress}%] {msg}")
         if db and task_id:
@@ -353,16 +379,31 @@ def run_gemini_analysis(srt_content, output_json_path, task_id=None, db=None):
     local_gemini_client = genai.Client(api_key=api_key)
 
     clean_content = preprocess_srt_to_seconds(srt_content)
-    response = local_gemini_client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=f"待處理逐字稿：\n{clean_content}\n\n請根據以上內容提供深度分析。\n\n【⚠️ 強制規定】: 你的所有回覆、標題與分析內容，必須使用嚴謹的「台灣繁體中文 (zh-TW)」輸出，絕對嚴禁出現任何簡體字與大陸用語。",
-        config={
-            "system_instruction": SYSTEM_PROMPT.strip(),
-            "response_mime_type": "application/json",
-            "response_json_schema": AnalysisResult.model_json_schema(),
-            "temperature": 1.0,
-        },
-    )
+    # 加入自動重試邏輯 (針對 503 錯誤)
+    response = None
+    for attempt in range(3):
+        try:
+            response = local_gemini_client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=f"待處理逐字稿：\n{clean_content}\n\n請根據以上內容提供深度分析。\n\n【⚠️ 強制規定】: 你的所有回覆、標題與分析內容，必須使用嚴謹的「台灣繁體中文 (zh-TW)」輸出，絕對嚴禁出現任何簡體字與大陸用語。",
+                config={
+                    "system_instruction": SYSTEM_PROMPT.strip(),
+                    "response_mime_type": "application/json",
+                    "response_json_schema": AnalysisResult.model_json_schema(),
+                    "temperature": 1.0,
+                },
+            )
+            break  # 成功則跳出
+        except Exception as e:
+            if ("503" in str(e) or "429" in str(e)) and attempt < 2:
+                wait_time = 3
+                update_status(
+                    f"⚠️ AI 伺服器繁忙 (503/429)，將於 {wait_time} 秒後自動重試 (第 {attempt+1} 次)...",
+                    80,
+                )
+                time.sleep(wait_time)
+                continue
+            raise e  # 其他錯誤或次數用盡則拋出
 
     # [Step 5] 解析與存檔
     update_status("📊 [5/5] 正在整理最後結果並存入雲端... (即將完成)", 95)

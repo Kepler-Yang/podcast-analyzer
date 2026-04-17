@@ -2,6 +2,8 @@
 firebase-admin==7.2.0
 google-cloud-firestore==2.25.0
 flask==3.1.0
+Flask-Cors==5.0.0
+requests==2.32.3
 
 # --- 下載與環境工具 ---
 yt-dlp>=2024.03.00

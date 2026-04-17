@@ -1,107 +1,108 @@
 # AI Podcast 分析助手 (WhisGe - 本地 GPU 加速版)
 
-## 專案簡介
-這是一個由前端網頁與 Python 後端交織而成的 Podcast / YouTube 音訊分析系統。
-透過強大的影音提取器 (yt-dlp) 自動下載目標影片的語音或攔截既有字幕，接著使用本地的 **GPU 加速 OpenAI Whisper 模型** 進行快速文字轉錄，最終將極高精度的逐字稿交由 **Google Gemini 模型** 進行洞見分析、提取重點精華、並條列出相關發燒個股。
+## 📖 專案簡介
+這是一個由前端網頁與 Python 後端交織而成的 Podcast / YouTube 音訊分析系統。透過強大的影音提取器 (yt-dlp) 自動下載目標影片的語音或攔截既有字幕，接著使用本地的 **GPU 加速 OpenAI Whisper 模型** 進行快速文字轉錄，最終將極高精度的逐字稿交由 **Google Gemini 模型** 進行洞見分析、提取重點精華、並條列出相關發燒個股。
 
 本分支專案為了解決原本架構中 YouTube 常見的機房 IP 封鎖與外部 API 限速，全面脫離了雲端與 Groq，打造出純種的 **Local First (本機優先)** 設計。
 
-## 架構特點與檔案說明
-- **前端 (`index-local.html`)**: 
-  - 提供極簡操作的網頁介面。直接對談 Firebase 排程器，且實裝了巧妙的 `狀態暗號化 (pending_local)`，**確保本機前端送出的任務只會由本機後端接單**，與正在服役中的雲端 (Render) 伺服器和平共存、永不搶單。
+---
 
-- **大腦管家 (`main_local.py`)**: 
-  - 任務排程、資料庫監聽、清理專家。內建**終極快取攔截機制**，一旦資料庫有過去成功分析過的紀錄，能達到 0 秒回傳 (0% 算力消耗)。它還將所有暫存任務推向 Windows 底層 Temp 資料夾，完全迴避了 VS Code Live Server 不斷重新整理的干擾。
+## 🏗️ 系統架構與模組說明
 
-- **處理引擎 (`processor_local.py`)**: 
-  - **核心運算管線**：它採用聰明的預判下載與純淨的 PyTorch `openai-whisper` 生態。不再受限於 25MB 上傳門檻，捨棄了繁雜耗時的轉碼壓縮，保證讓本地顯示卡 (GPU) 完全釋放效能狂飆。最後並導入高強制性的 Prompting，逼迫 AI 撰寫出字正腔圓的台灣繁體中文。
+### 核心目錄與檔案樹狀圖 (File Tree)
+```text
+📦 podcast-analyzer
+ ┣ 📜 index-local.html          # 前端：極簡網頁介面與浮動對話視窗
+ ┣ 📜 main_local.py             # 後端：大腦管家 (API、排程與路由)
+ ┣ 📜 processor_local.py        # 引擎：核心運算管線 (yt-dlp + Whisper + Gemini 分析)
+ ┣ 📜 chat_Gemini_local.py      # 對話：本機 Gemini Chat 核心模組 
+ ┗ 📜 firebase_storage_local.py # 儲存：Firebase Storage 取用與持久化
+```
 
-- **儲存傳遞 (`firebase_storage_local.py`)**: 
-  - 獨立封裝。將跑完的檔案 (.srt / .json) 安全且持久地掛載於 Firebase Cloud Storage 上，供前端點擊下載使用。
+### 模組功能對照表
+| 模組名稱 | 負責功能 | 架構亮點 |
+|----------|----------|----------|
+| **前端網頁** (`index-local.html`) | UI 渲染、狀態暗號發送、仿 AdminLTE 對話視窗 | 使用 `pending_local` 暗號確保本機後端專屬接單，與雲端系統和平共存不搶單。 |
+| **大腦管家** (`main_local.py`) | 任務排程、資料庫監聽、快取攔截 | 攔截成功即可 0 秒回傳 (0% 算力消耗)；資料與暫存路徑全自動處理。 |
+| **處理引擎** (`processor_local.py`) | 網址解析、下載、轉錄、生成 AI 報告 | 無 25MB 大小限制，100% 釋放本地 GPU 算力；高強制性繁體中文 Prompting。 |
+| **對話系統** (`chat_Gemini_local.py`) | 管理多輪對話 Session、狀態持久化 | 獨立記憶體隔離；附帶 3 秒極速 503/429 智能重試機制。 |
+| **儲存傳遞** (`firebase_storage_local.py`) | 處理檔案上傳 / 下載 / 簽名網址產生 | 將跑完的 SRT / JSON 安全且持久地掛載於 Firebase Cloud Storage。 |
+
+---
+
+## ⚙️ 核心流程圖 (Core Workflow)
+
+```mermaid
+flowchart TD
+    A[前端發起任務] --> B{Firebase 有無既有 JSON?}
+    B -- 已存在 --> C[🌟 秒殺回傳: 直接複製舊結果]
+    B -- 未存在 --> D{Storage 是否有轉錄 SRT?}
+    D -- 已存在 --> E[🌟 跳轉: 下載 SRT &rarr; Gemini 深度分析]
+    D -- 未存在 --> F{Temp 目錄有音檔?}
+    F -- 已存在 --> G[🌟 續跑: Whisper 轉錄 &rarr; 上傳 SRT &rarr; Gemini 分析]
+    F -- 未存在 --> H[🌟 拓荒: yt-dlp 下載 &rarr; Whisper 轉錄 &rarr; 上傳 SRT &rarr; Gemini 分析]
+    
+    E --> I[上傳 JSON &rarr; 寫入 Firestore &rarr; 回傳前端]
+    G --> I
+    H --> I
+    
+    I --> J{全部階段皆成功?}
+    J -- 是 --> K[🧹 刪除本地暫存檔]
+    J -- 否 --> L[📦 保留本地檔案供下次續跑]
+```
 
 ---
 
 ## 🛠️ 環境配置與啟動指南
 
-### Step 1: 安裝運行環境
-為確保 GPU 能被徹底調用，建議使用已裝妥 CUDA 之 Anaconda 或虛擬環境進行：
-```powershell
-pip install -r requirements.txt
-```
+| 步驟 | 說明 | 執行指令 / 動作 |
+|------|------|-----------------|
+| **1. 安裝環境** | 為確保 GPU 調用，建議使用已裝妥 CUDA 之 Anaconda 或虛擬環境 | `pip install -r requirements.txt` |
+| **2. 設置金鑰** | 複製 `.example` 檔案並填寫嚴禁外流的 API 參數 | 1. 建立 `.env` 填妥 GEMINI_API_KEY <br> 2. 建立 `serviceAccountKey.json` |
+| **3. 啟動後端** | 啟動 Python 監聽服務，準備接單 | `python main_local.py` |
+| **4. 啟動前端** | 使用 Live Server 啟動 HTML 介面進行測試 | 開啟 `index-local.html` |
 
-### Step 2: 設置金鑰 (環境變數)
-您必須自行準備兩把鑰匙，且 **絕對不可將它們推播上傳到 GitHub**：
-1. **Google Gemini API**:
-   將附贈的 `.env.example` 複製一份改名為 **`.env`**，填入您的 API Token。
-2. **Firebase 最高權限鑰匙**:
-   將附贈的 `serviceAccountKey.json.example` 複製一份改名為 **`serviceAccountKey.json`**，並確實驗證內容（這把鑰匙掌控了您從後端更動 Firestore 的權限）。
-
-### Step 3: 一鍵啟動
-1. 啟動後端待命：
-```powershell
-python main_local.py
-```
-2. 使用 VS Code Live Server 開啟 `index-local.html` 網頁。
-貼上任意 YouTube 或 ApplePodcast 網址，體驗無限制的極速解析！
+> 💡 **Tip:** 啟動後貼上任意 YouTube 或 ApplePodcast 網址，即可體驗無限制的極速解析與互動式 AI 對話！
 
 ---
 
 ## 🛡️ 資安與 GitHub 提交建議 
-1. `index-local.html`: 雖然含有 apiKey 參數，但那是前端初始化 Firebase App 用途 (屬於公開識別碼)，受到您的 Security Rules 去限制權限，因此**能安全上傳**。
-2. `python 腳本群`: 所有的 `.py` 代碼目前已無寫死的私人 Key (原先存在的 Gemini Key 已被清除，全面掛載 env)，因此**能安全上傳**。
-3. `requirements.txt, .example`: 皆**安全可上傳**。
-4. **警告禁止上傳清單**：真正有資安疑慮的只有 `.env` 與 `serviceAccountKey.json`，請確認它們靜靜躺在 `.gitignore` 內。
+
+| 檔案/類型 | 上傳安全性 | 說明限制 |
+|-----------|------------|----------|
+| `index-local.html` | ✅ **安全** | 內含的 apiKey 為公開識別碼，受 Firebase Security Rules 保護。 |
+| `.py` 腳本群 | ✅ **安全** | 敏感金鑰已全面清理並掛載 `.env`，可放心 push 上傳。 |
+| `requirements.txt` | ✅ **安全** | 環境依賴檔。 |
+| `.env` | ❌ **嚴禁上傳** | 內含 Gemini AI 扣款點數！請確認已加入 `.gitignore`。 |
+| `serviceAccountKey...`| ❌ **嚴禁上傳** | 內含資料庫最高改寫權限！請確認已加入 `.gitignore`。 |
 
 ---
 
-## 📋 2026-04-17 架構重構紀錄
+## 📋 系統機制與近期優化亮點
 
-### 一、啟動預檢機制 (`preflight_check`)
-- Python 一啟動就驗證 `serviceAccountKey.json` 和 `GEMINI_API_KEY` 是否存在。
-- 未通過直接以友善提示終止程式（`sys.exit(1)`），不會拋出原始 Python traceback。
-- `firebase_storage_local.py` 的模組載入階段也加入相同的檔案存在檢查。
+### 1. 三層快取與資料流機制
+系統設計了極高的容錯與斷點續跑能力：
 
-### 二、三層快取機制（斷點續跑）
-承接任務後，依序檢查三層快取，能從哪裡接就從哪裡接：
+| 快取層級 | 檢查目標 | 命中觸發動作 |
+| :--- | :--- | :--- |
+| **Layer 1** | Firestore `transcripts` 集合 | 直接回傳前端 (0 秒) |
+| **Layer 2** | Firebase Storage 資料夾 | 下載 SRT &rarr; 直接進入 Gemini 分析 |
+| **Layer 3** | 本地 `%TEMP%` 目錄 | 跳過下載 &rarr; 直接 Whisper 轉錄 |
+| **Layer 4** | 什麼都沒有 | 完整從頭拓荒 |
 
-| Layer | 檢查目標 | 命中後的動作 |
-|-------|---------|------------|
-| Layer 1 | Firestore `transcripts` 集合 (用 `originalUrl` 比對) | 直接複製舊結果回傳前端 (0 秒) |
-| Layer 2 | Firebase Storage `transcripts/{url_hash}/` 資料夾 | 下載 SRT → 跳到 Gemini 分析 |
-| Layer 3 | 本地暫存目錄 `%TEMP%/whisge_{url_hash}/` | 跳過 yt-dlp 下載 → Whisper 轉錄 |
-| Layer 4 | 都沒有 | 從頭開始 (yt-dlp → Whisper → Gemini) |
+### 2. 資料存放架構設計
+存放路徑全面採用 **URL 的 MD5 Hash**，確保跨平台 (雲端/地端) 完美共享。
 
-### 三、各步驟完成即上傳
-- **SRT 轉錄完成** → 立即上傳至 Firebase Storage（即使 Gemini 後續失敗，SRT 已安全保存）。
-- **JSON 分析完成** → 立即上傳至 Firebase Storage。
-- **失敗不刪檔**：只有全部成功才清理本地暫存目錄，失敗時保留所有檔案供下次續跑。
+| 資料類型 | Firebase Storage 存放狀態 | Firestore (資料庫) 存放狀態 |
+| :--- | :--- | :--- |
+| **SRT 逐字稿** | ✅ 完整 `.srt` 檔案 | ❌ 只記錄網址 |
+| **JSON 分析報告** | ✅ 完整 `.json` 檔案 | ✅ 拆分各欄位儲存 (供前端 UI 渲染用) |
+| **Metadata 資訊** | ❌ (僅輔助檔名命名) | ✅ 儲存時長、縮圖於 `tasks` 集合 |
 
-### 四、統一 Storage 路徑（跨版本共用）
-本地版與雲端版 (Render) 統一使用 **URL 的 MD5 hash** 作為 Storage 資料夾 key：
-
-```
-Firebase Storage
-└── transcripts/
-    └── {MD5(url)}/            ← 同一 URL 永遠相同，跨版本可復用
-        ├── {safe_title}.srt   ← 檔名使用 yt-dlp 解讀的影片標題
-        └── {safe_title}.json  ← 檔名使用 yt-dlp 解讀的影片標題
-```
-
-**效果**：本地版跑完的 SRT/JSON，雲端版也能在 Layer 2 快取中找到，反之亦然。避免同一 Podcast 在不同環境重複下載與分析。
-
-### 五、改動檔案清單
-
-| 檔案 | 改動摘要 |
-|------|---------|
-| `main_local.py` | 新增 `preflight_check()`、三層快取邏輯、SRT/JSON 即完即傳、失敗不刪檔 |
-| `processor_local.py` | 接收外部 `temp_dir`、下載前檢查本地音檔快取、Gemini 抽出為獨立函式 `run_gemini_analysis()` |
-| `firebase_storage_local.py` | 新增 `url_to_storage_key()`、`find_file_in_storage()`、`download_file_from_storage()`、`get_signed_url()`、啟動時檔案存在檢查 |
-
-### 六、資料存放架構
-
-| 資料 | Firebase Storage (檔案) | Firestore (資料庫) |
-|------|------|------|
-| SRT 逐字稿 | ✅ 完整 `.srt` 檔案 | ❌ |
-| JSON 分析結果 | ✅ 完整 `.json` 檔案 (備份用) | ✅ 拆開存各欄位 (前端渲染用) |
-| metadata (標題/頻道/時長) | ❌ | ✅ tasks + transcripts 集合 |
-
+### 3. 特殊優化與修復紀錄
+| 系統類別 | 優化項目 | 升級說明 |
+|----------|----------|----------|
+| **健壯性** | 環境預檢 (Preflight) | 啟動時自動檢查金鑰設定，若未設定即安全防呆暫停。 |
+| **高可用性** | AI 極速重試機制 | 遇 503 HTTP 或 429 配額超載錯誤，僅遲延 **3秒** 即自動重連 (最多重試 3 次)。 |
+| **記憶體防護** | 連線截斷防護 | 將 `google.genai.Client` 實體與狀態強制綁定，封殺 Garbage Collection 造成的 Session 閃退。 |
+| **使用者體驗** | UI 動態回饋與心跳 | 加入實體連線心跳燈號設計、10 秒等待壅塞提示自動染橘機制，消解等待焦慮。 |
