@@ -52,7 +52,7 @@
                     </div>
                     <input type="text" id="sourceUrl"
                         class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                        placeholder="貼上 Apple Podcast 或 YouTube 網址, 或輸入 TEST 預覽結果">
+                        placeholder="貼上 Apple Podcast 或 YouTube 網址, 或輸入 TEST 預覽預設結果">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="sendTask()"
@@ -300,67 +300,6 @@
         </div>
     </div>
 
-    <!-- 💬 Gemini 聊天視窗 (浮動式) -->
-    <div id="chat-container" class="hidden fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
-        <!-- 對話視窗本體 -->
-        <div id="chat-window" class="w-[380px] h-[500px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col transition-all duration-300 translate-y-full opacity-0 pointer-events-none mb-4">
-            <!-- Header -->
-            <div class="bg-slate-900 p-4 text-white flex items-center justify-between">
-                <div class="flex items-center">
-                    <div class="bg-blue-500 p-1.5 rounded-lg mr-3">
-                        <i data-lucide="bot" class="size-5"></i>
-                    </div>
-                    <div>
-                        <h5 class="font-bold text-sm leading-none mb-1">Gemini AI 助手</h5>
-                        <p id="chat-status" class="text-[10px] text-slate-400 flex items-center">
-                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></span>
-                            正在對話中
-                        </p>
-                    </div>
-                </div>
-                <button onclick="toggleChat()" class="hover:bg-white/10 p-1 rounded-lg transition-colors">
-                    <i data-lucide="chevron-down" class="size-5"></i>
-                </button>
-            </div>
-
-            <!-- Messages List -->
-            <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-slate-50 space-y-4 flex flex-col">
-                <!-- AI Welcome Message -->
-                <div class="flex flex-col mb-4 max-w-[85%] relative">
-                    <div class="flex items-baseline mb-1">
-                        <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
-                    </div>
-                    <div class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm">
-                        您好！我是您的進階 Podcast 分析助手。我已經閱讀完這集節目的逐字稿，您可以問我任何細節。
-                    </div>
-                </div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="p-4 border-t border-slate-100 bg-white">
-                <form onsubmit="sendChatMessage(event)" class="flex items-center gap-2">
-                    <input type="text" id="chat-input" 
-                        class="flex-grow bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                        placeholder="請輸入您的問題...">
-                    <button type="submit" id="chat-submit-btn"
-                        class="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center">
-                        <i data-lucide="send" class="size-4"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 浮動啟動按鈕 -->
-        <button onclick="toggleChat()" 
-            class="bg-slate-900 text-white p-4 rounded-full shadow-xl hover:bg-blue-600 transition-all active:scale-95 group relative">
-            <i data-lucide="message-square" class="size-6"></i>
-            <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-            </span>
-        </button>
-    </div>
-
     <footer class="py-8 text-center text-slate-400 text-sm border-t bg-white">
         <p>© 2026 AI Podcast 分析助手 | 資料流：Web → Firestore → Backend</p>
     </footer>
@@ -499,12 +438,12 @@
             document.getElementById('content').classList.add('hidden');
             document.getElementById('pre-info').classList.add('hidden');
             document.getElementById('progress-bar').style.width = "50%";
-            document.getElementById('progress-msg').innerText = "📥 正在請求本地 TEST.json 測試檔案...";
+            document.getElementById('progress-msg').innerText = "📥 正在請求本地 preview.json 測試檔案...";
             document.getElementById('task-status').innerText = "讀取測試資料中...";
 
             try {
                 // 從本地 TEST.json 讀取真實結構
-                const response = await fetch('TEST.json');
+                const response = await fetch('preview.json');
                 if (!response.ok) throw new Error("找不到 TEST.json");
                 const testData = await response.json();
 
@@ -538,7 +477,7 @@
                     document.getElementById('pre-duration').innerText = testData.metadata.duration_text;
 
                     // 套用結果至畫面
-                    updateUI(testData, "https://apple.com/test-podcast");
+                    updateUI(testData, "https://podcasts.apple.com/tw/");
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('content').classList.remove('hidden');
                     document.getElementById('task-status').innerText = "✅ 成功進入測試與對話模式";
@@ -546,12 +485,12 @@
                     // 【核心連動功能】標記這是一個測試任務，讓開啟聊天時給後端識別
                     window.currentChatTaskId = "test_demo_task";
                     window.currentPodcastTitle = testData.title || "測試 Podcast";
-                    document.getElementById('chat-container').classList.remove('hidden');
+                    document.getElementById('chat-launcher').classList.remove('hidden'); // 👈 新增：展開內容區的啟動按鈕
 
                 }, 800);
 
             } catch (err) {
-                alert("進入測試模式失敗 (請確認目錄中是否有 TEST.json): \n" + err);
+                alert("進入測試模式失敗 (請確認目錄中是否有 preview.json): \n" + err);
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('task-status').innerText = "❌ 測試模式啟動失敗";
             }
@@ -718,12 +657,10 @@
             
             if (isClosed) {
                 // 打開
-                chatWindow.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
-                chatWindow.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                chatWindow.classList.replace('translate-y-full', 'translate-y-0');
             } else {
                 // 收折
-                chatWindow.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
-                chatWindow.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+                chatWindow.classList.replace('translate-y-0', 'translate-y-full');
             }
         };
 
@@ -801,6 +738,21 @@
                     loadingText.classList.add('text-orange-500');
                 }
             }, 10000);
+
+            // 💡 [TEST模式攔截器]：若為測試任務，直接給予模擬回覆
+            if (taskId === 'test_demo_task') {
+                setTimeout(() => {
+                    const indicator = document.getElementById('chat-typing-indicator');
+                    if(indicator) indicator.remove();
+                    addMessageToUI('Gemini', '這是一個來自預覽模式的模擬回覆。在大腦分析中，我們可以看到這集節目的核心重點在於 AI 的未來與半導體軟硬體整合的趨勢。<br><br>如果您有具體的問題，歡迎在正式模式下進行提問！');
+                    inputEl.disabled = false;
+                    submitBtn.innerHTML = '<i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>';
+                    lucide.createIcons();
+                    inputEl.focus();
+                    clearTimeout(loadingTimer);
+                }, 1500);
+                return;
+            }
 
             try {
                 // 發送 POST 到本地後端 /chat API
