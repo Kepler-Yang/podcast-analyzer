@@ -4,19 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Podcast 分析助手</title>
+    <title>AI Podcast 分析助手 | 本地版</title>
+    <meta name="description" content="採用本地 GPU 加速的 Podcast 深度分析工具，即時轉錄與 AI 策略摘要。">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
 
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .chat-bubble-fade {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
     <!-- S01: 導航欄 -->
     <nav class="bg-slate-900 text-white py-6 shadow-lg border-b-4 border-emerald-600">
@@ -32,7 +55,7 @@
                     <i data-lucide="info" class="size-4 mr-1"></i> 運作架構
                 </button>
 
-                <!-- S01-2: 連線狀態指示燈, 使用onSnapshot即時監聽(Heartbeat) -->
+                <!-- S01-2: 連線狀態指示燈 -->
                 <div id="status-indicator" class="flex items-center text-sm text-slate-400">
                     <span id="ping-dot" class="relative flex h-3 w-3 mr-2">
                         <span id="ping-pulse"
@@ -71,7 +94,7 @@
             <p id="task-status" class="mt-3 text-xs text-slate-400 text-center"></p>
         </section>
 
-        <!-- S03: 全局影片預覽卡片 (顯示在輸入框下方，載入與結果區上方) -->
+        <!-- S03: 影片預覽卡片 -->
         <div id="pre-info"
             class="hidden w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-md border mb-8 p-5 flex items-center gap-6">
             <img id="pre-thumb" src=""
@@ -79,11 +102,11 @@
             <div class="flex-grow">
                 <h4 id="pre-title" class="font-bold text-slate-800 text-lg leading-tight mb-2">正在讀取影片資訊...</h4>
                 <div class="flex flex-wrap gap-4 text-sm">
-                    <span id="pre-channel-wrap" class="flex items-center text-slate-600">
+                    <span class="flex items-center text-slate-600">
                         <i data-lucide="user" class="size-4 mr-1 text-emerald-500"></i>
                         <span id="pre-channel"></span>
                     </span>
-                    <span id="pre-duration-wrap" class="flex items-center text-slate-600">
+                    <span class="flex items-center text-slate-600">
                         <i data-lucide="clock" class="size-4 mr-1 text-emerald-500"></i>
                         <span id="pre-duration"></span>
                     </span>
@@ -95,7 +118,6 @@
         <div id="loading" class="hidden flex flex-col items-center justify-center py-10">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-6"></div>
             <p id="progress-msg" class="text-slate-500 font-bold mb-4">等待本地程式認領任務...</p>
-
             <!-- 動態進度條 -->
             <div class="w-full max-w-xs h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div id="progress-bar" class="h-full bg-emerald-600 transition-all duration-500" style="width: 0%">
@@ -105,8 +127,8 @@
 
         <!-- S05: 內容展示區 -->
         <div id="content" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-7">
-                <!-- S05-1: 左側：重點摘要 -->
+            <!-- S05-1: 左側：重點摘要 -->
+            <div class="lg:col-span-12 xl:col-span-7">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                     <div class="flex items-center justify-between mb-6">
                         <span
@@ -120,7 +142,6 @@
                         </h4>
                         <p id="display-insight"
                             class="text-slate-600 leading-relaxed text-lg text-justify whitespace-pre-wrap mb-8"></p>
-
                         <!-- 個股與族群標籤 -->
                         <div class="space-y-4 pt-6 border-t border-slate-100">
                             <div id="section-stocks" class="hidden">
@@ -141,9 +162,8 @@
                     </div>
                 </div>
             </div>
-
             <!-- S05-2: 右側：逐字稿時間軸 與 資源下載 -->
-            <div class="lg:col-span-5 space-y-8">
+            <div class="lg:col-span-12 xl:col-span-5 space-y-8">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                     <h4 class="flex items-center text-slate-900 font-bold mb-6">
                         <i data-lucide="list-video" class="mr-2 text-emerald-600"></i> 精彩亮點
@@ -164,8 +184,7 @@
                         </a>
                         <a id="download-json" href="#" target="_blank"
                             class="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors p-4 rounded-xl border border-white/10">
-                            <span class="flex items-center"><i data-lucide="code" class="mr-3"></i> 分析結果
-                                (.json)</span>
+                            <span class="flex items-center"><i data-lucide="code" class="mr-3"></i> 分析結果 (.json)</span>
                             <i data-lucide="external-link" class="size-4 opacity-50"></i>
                         </a>
                         <a id="source-link" href="#" target="_blank"
@@ -176,13 +195,11 @@
                         </a>
                     </div>
                 </div>
-
-
             </div>
         </div>
     </main>
 
-    <!-- S06: Chat with Gemini 啟動按鈕 (懸浮圓球) -->
+    <!-- S06: Chat 啟動按鈕 (懸浮圓球) -->
     <div id="chat-launcher" class="hidden fixed bottom-6 right-6 z-40">
         <button onclick="toggleChat()"
             class="bg-blue-600 text-white p-4 rounded-full shadow-2xl hover:bg-blue-700 transition-all hover:scale-105 active:scale-95 group relative flex items-center justify-center border-[3px] border-white ring-4 ring-blue-500/20">
@@ -196,47 +213,51 @@
         </button>
     </div>
 
-    <!-- S07: Chat with Gemini 對話視窗 (參考AdminLTE) -->
+    <!-- S07: Chat with Gemini 對話視窗 -->
     <div id="chat-window"
-        class="fixed bottom-0 right-0 w-full md:w-[450px] bg-white border-t border-l border-slate-200 shadow-2xl flex flex-col z-50 transition-transform duration-300 transform translate-y-full"
-        style="height: 600px; max-height: 80vh; border-top-left-radius: 1rem;">
-
+        class="fixed bottom-0 right-0 w-full md:w-[450px] glass-effect border-t border-l border-slate-200 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] flex flex-col z-50 transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) transform translate-y-full"
+        style="height: 600px; max-height: 85vh; border-top-left-radius: 1.5rem;">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-4 flex justify-between items-center rounded-tl-2xl cursor-pointer"
+        <div class="bg-slate-800/95 backdrop-blur-md text-white p-5 flex justify-between items-center rounded-tl-2xl cursor-pointer"
             onclick="toggleChat()">
             <div class="flex items-center">
-                <i data-lucide="bot" class="mr-2 size-5 text-blue-400"></i>
-                <h3 class="font-bold text-md">Gemini 大腦助手</h3>
-
+                <div class="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center mr-3">
+                    <i data-lucide="bot" class="size-5 text-emerald-400"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm">Gemini 大腦助手</h3>
+                    <p class="text-[10px] text-emerald-400 flex items-center">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
+                        AI 思考中
+                    </p>
+                </div>
             </div>
-            <button class="focus:outline-none hover:bg-slate-600 p-1 rounded transition-colors">
-                <i data-lucide="chevron-down" class="size-5"></i>
+            <button class="focus:outline-none hover:bg-white/10 p-2 rounded-full transition-colors">
+                <i data-lucide="chevron-down" class="size-5 text-slate-400"></i>
             </button>
         </div>
-
         <!-- Chat Messages Area -->
-        <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-[#f4f6f9] space-y-4">
-            <!-- 預設歡迎訊息 -->
-            <div class="flex flex-col mb-4 max-w-[85%] relative">
+        <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-slate-50/50 space-y-4">
+            <!-- 歡迎訊息 -->
+            <div class="flex flex-col mb-4 max-w-[85%] relative chat-bubble-fade">
                 <div class="flex items-baseline mb-1">
-                    <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
+                    <span class="font-bold text-slate-800 text-xs mr-2">Gemini</span>
                 </div>
                 <div
-                    class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm">
+                    class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm text-sm leading-relaxed">
                     嗨！聽完這集 Podcast，你有什麼想更深入了解的嗎？
                 </div>
             </div>
         </div>
-
         <!-- Chat Input Area -->
-        <div class="p-3 border-t bg-white">
+        <div class="p-4 border-t bg-white/50 backdrop-blur-md">
             <form id="chat-form" class="relative flex items-center" onsubmit="sendChatMessage(event)">
                 <input type="text" id="chat-input"
-                    class="w-full bg-slate-100 border-none rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Type Message ..." autocomplete="off">
+                    class="w-full bg-slate-200/50 border-none rounded-2xl pl-4 pr-12 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-medium"
+                    placeholder="詢問關於內容的問題..." autocomplete="off">
                 <button type="submit" id="chat-submit-btn"
-                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 transition-colors focus:outline-none">
-                    <i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>
+                    class="absolute right-2.5 top-1/2 transform -translate-y-1/2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl p-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-90">
+                    <i data-lucide="send" class="size-4"></i>
                 </button>
             </form>
         </div>
@@ -245,17 +266,15 @@
     <!-- S08: 架構說明 Modal -->
     <div id="architecture-modal"
         class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full flex flex-col overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <h3 class="text-xl font-bold flex items-center text-slate-800">
                     <i data-lucide="network" class="mr-2 text-emerald-600"></i> 系統運作架構說明
                 </h3>
-                <button onclick="toggleModal()" class="text-slate-400 hover:text-slate-600 focus:outline-none">
-                    <i data-lucide="x" class="size-6"></i>
-                </button>
+                <button onclick="toggleModal()"><i data-lucide="x" class="size-6 text-slate-400"></i></button>
             </div>
             <div class="px-6 py-6 overflow-y-auto prose prose-slate prose-emerald max-w-none">
-                <p class="text-slate-600 mb-6">這是一個完全採用本地 GPU 加速引擎的「非同步任務處理」流程，包含了五個主要階段：</p>
+                <p class="text-slate-600 mb-6">這是一個採用本地 GPU 加速引擎的「非同步任務處理」流程，包含了六個主要階段：</p>
 
                 <div class="space-y-6">
                     <div class="border-l-4 border-emerald-500 pl-4">
@@ -264,7 +283,7 @@
                             前端發起請求 (HTML / GitHub Pages)</h4>
                         <p class="text-slate-600 mt-2 text-sm leading-relaxed">使用者輸入網址後，JavaScript 將帶有暗號的任務寫入
                             <strong>Firebase</strong> 的 <code>tasks</code> 集合（狀態設定為
-                            <code>pending_local</code>），防止雲端伺服器搶單。
+                            <code>pending_local</code>），並獲得專屬 ID。
                         </p>
                     </div>
 
@@ -272,7 +291,7 @@
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-orange-100 text-orange-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">2</span>
                             雲端中繼站 (Firebase)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">擔任前後端溝通的唯一橋樑。它收到了前端貼上來的新任務佈告，默默等待後端來認領處理。
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">擔任前後端溝通的唯一橋樑。它收到了前端貼上來的新任務佈告，默默等待本地後端認領。
                         </p>
                     </div>
 
@@ -280,9 +299,8 @@
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">3</span>
                             後端運算引擎 (Local 本機端 GPU)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">您本機的 Python 伺服器發現
-                            <code>pending_local</code> 任務後，便會無視一切檔案大小限制，透過 yt-dlp 暴力下載，接著調用本地顯示卡的 CUDA 算力給 OpenAI
-                            Whisper 轉錄 ➔ 最後交由 Gemini AI 產出高純度分析。
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">您本機的 Python 伺服器發現任務後，便會下載音檔 ➔ 調用本地顯卡 GPU
+                            進行 Whisper 轉錄 ➔ 產出摘要。
                         </p>
                     </div>
 
@@ -290,16 +308,26 @@
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-green-100 text-green-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">4</span>
                             雲端儲存 (Firebase Storage)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">運算完成後，生成的逐字稿 (<code>.srt</code>)
-                            與結果會被備份儲存至 Firebase Storage 之中，並產生專屬連結供您隨時調閱下載。</p>
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">運算完成後，將生成的逐字稿 (<code>.srt</code>) 與摘要
+                            (<code>.json</code>)
+                            備份儲存至 Firebase Storage，供日後回頭調閱。</p>
                     </div>
 
                     <div class="border-l-4 border-emerald-500 pl-4">
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-emerald-100 text-emerald-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">5</span>
                             結果回傳前端 (Firebase -> HTML)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">本地腳本將最後的分析結果寫回
-                            Firebase。此時網頁的監聽器立刻捕捉到變動，隨即渲染這份來自本地硬體的心血結晶給您！
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">Firestore 的 <strong>即時監聽機制
+                                (onSnapshot)</strong> 會立刻捕捉到資料變動，網頁隨即解除轉圈圈。
+                        </p>
+                    </div>
+
+                    <div class="border-l-4 border-orange-500 pl-4">
+                        <h4 class="font-bold flex items-center text-lg m-0"><span
+                                class="bg-orange-100 text-orange-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">6</span>
+                            Chat with Gemini (Local Python)</h4>
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">
+                            在<strong>前端對話視窗</strong>中輸入問題後，本地 Python 會透過 <strong>Gemini API</strong> 進行深入反覆問答。
                         </p>
                     </div>
                 </div>
@@ -307,7 +335,7 @@
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end">
                 <button onclick="toggleModal()"
                     class="px-6 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-700 font-medium transition-colors">
-                    太棒了，我明白了！
+                    了解！
                 </button>
             </div>
         </div>
@@ -321,9 +349,9 @@
     <!-- 程式碼區域 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, onSnapshot, addDoc, serverTimestamp, where, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // -- J01: Firebase config設定 --
+        // -- J01: Firebase config --
         const firebaseConfig = {
             apiKey: "AIzaSyDK8b3B9Q41RdLX-wKa_BBbTDjKizf75-w",
             authDomain: "whisge-1683c.firebaseapp.com",
@@ -344,105 +372,62 @@
             lucide.createIcons();
         };
 
-        // -- J03: 連線狀態監聽 (for S01-2: 連線狀態指示燈) ---
+        // -- J03: 後端連線狀態監聽 (Heartbeat) ---
         const checkBackendStatus = () => {
             const statusText = document.getElementById('status-text');
             const pingPulse = document.getElementById('ping-pulse');
             const pingLed = document.getElementById('ping-led');
 
-            console.log("📡 正在嘗試連線到 Firestore 狀態監聽器...");
-
             onSnapshot(doc(db, "system_status", "local_engine"), (snapshot) => {
-                console.log("📥 收到狀態更新！");
-                if (!snapshot.exists()) {
-                    console.warn("⚠️ 找不不到 system_status/local_engine 文件");
-                    setOffline();
-                    return;
-                }
-
+                if (!snapshot.exists()) { setOffline(); return; }
                 const data = snapshot.data();
-                if (!data || !data.last_seen) {
-                    console.log("⏳ 等待伺服器確認時間戳記...");
-                    return;
-                }
+                if (!data || !data.last_seen) return;
 
-                // 判斷是否在 60 秒內有更新
                 const lastSeen = data.last_seen.toDate().getTime();
                 const now = new Date().getTime();
                 const diffSec = (now - lastSeen) / 1000;
 
-                console.log(`⏱️ 最後在線時間: ${diffSec.toFixed(1)} 秒前`);
-
                 if (diffSec < 60) {
                     statusText.innerText = "本地後端已連線";
-                    statusText.className = "text-emerald-400";
+                    statusText.className = "text-emerald-400 text-sm";
                     pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
                     pingLed.className = "relative inline-flex rounded-full h-3 w-3 bg-green-500";
-                } else {
-                    setOffline();
-                }
-            }, (error) => {
-                console.error("❌ Firestore 監聽報錯:", error);
-                statusText.innerText = "連線檢查失敗 (權限 Error)";
-                statusText.className = "text-red-400";
+                } else { setOffline(); }
             });
 
             function setOffline() {
                 statusText.innerText = "本地後端未啟動";
-                statusText.className = "text-red-400";
+                statusText.className = "text-red-400 text-sm";
                 pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
                 pingLed.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
             }
         };
-        // 啟動初始連線檢查
         checkBackendStatus();
 
-        // -- J04: 控制「免費仔辛酸血淚」區塊展開/收合(本地端沒有使用) --
-        window.toggleFrugalSection = () => {
-            const content = document.getElementById('frugal-content');
-            const chevron = document.getElementById('frugal-chevron');
-            const isHidden = content.classList.contains('hidden');
-
-            content.classList.toggle('hidden');
-            chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-        };
-
-        // -- J05: 發送任務至後端 --
-        let currentUnsubscribe = null; // 儲存目前的監聽連線，以便在發送新任務前關閉舊連線
+        // -- J05: 發送任務 --
+        let currentUnsubscribe = null;
         window.sendTask = async () => {
             const urlInput = document.getElementById('sourceUrl').value.trim();
             if (!urlInput) return;
 
-            // [1] 特殊功能：輸入 TEST 直接進入演示模式 (讀取 preview.json)
-            if (urlInput.toUpperCase() === 'TEST') {
-                runDemoMode();
-                return;
-            }
+            // 💡 特殊功能：輸入 TEST 直接顯示模擬資料
+            if (urlInput.toUpperCase() === 'TEST') { runDemoMode(); return; }
 
-            // [2] 基本檢查：僅支援 Apple Podcast 或 YouTube
             const isYoutube = urlInput.includes("youtube.com") || urlInput.includes("youtu.be");
             const isApple = urlInput.includes("podcasts.apple.com");
+            if (!isApple && !isYoutube) { alert("❌ 請輸入正確的 Apple Podcast 或 YouTube 連結。"); return; }
 
-            if (!isApple && !isYoutube) {
-                alert("❌ 請輸入正確的 Apple Podcast 或 YouTube 連結。\n目前僅支援這兩個平台。");
-                return;
-            }
-
-            // [3] 切換 UI 狀態：隱藏舊結果，顯示載入進度條
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('content').classList.add('hidden');
             document.getElementById('pre-info').classList.add('hidden');
-            document.getElementById('task-status').innerText = "任務已送達 Firebase，等待後端認領...";
+            document.getElementById('task-status').innerText = "任務已發送，等待後端處理...";
 
             try {
-                // [4] 核心操作：將任務寫入 Firestore 資料庫的 'tasks' 集合
                 const docRef = await addDoc(collection(db, "tasks"), {
                     url: urlInput,
-                    status: "pending_local", // 標記為本地端待處理任務
+                    status: "pending_local",
                     timestamp: serverTimestamp()
                 });
-
-                // [5] 啟動監聽器：開始盯著剛建立的這個任務 ID，等待結果回傳
                 listenToSpecificResult(docRef.id, urlInput);
             } catch (e) {
                 alert("發送失敗: " + e.message);
@@ -450,130 +435,68 @@
             }
         };
 
-        // -- J06: 模擬演示模式 (串接 preview.json, 預覽卡片Demo, Gemini對話視窗Demo) --
-        async function runDemoMode() {
-            // [1] UI 介面初始化：隱藏輸入區與結果區，顯示讀取條與模擬文字
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('content').classList.add('hidden');
-            document.getElementById('pre-info').classList.add('hidden');
-            document.getElementById('progress-bar').style.width = "50%";
-            document.getElementById('progress-msg').innerText = "📥 正在請求本地 preview.json 測試檔案...";
-            document.getElementById('task-status').innerText = "讀取測試資料中...";
-
-            try {
-                // [2] 抓取本地的測試資料
-                const response = await fetch('preview.json');
-                if (!response.ok) throw new Error("找不到 preview.json");
-                const testData = await response.json();
-
-                // [3] 防呆處理：若測試 JSON 缺少縮圖或標題資訊，自動填入預設值，避免預覽卡片報錯
-                if (!testData.metadata) {
-                    testData.metadata = {
-                        thumbnail: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/04/b5/eb/04b5ebdf-7072-21fc-5876-e5feb5ba3dac/mza_7653733142335128691.jpeg/300x300bb.webp",
-                        title: testData.title || "測試 Podcast (來自 preview.json)",
-                        channel: "測試頻道",
-                        duration_text: "40:30(DEMO)"
-                    };
-                }
-
-                // [4] 時間格式預處理：將 JSON 的字串時間轉換為模擬的 Firestore Timestamp 物件範式
-                // 這是為了配合 updateUI 裡面的 .toDate() 函式，防止格式不符當掉
-                if (testData.timestamp && typeof testData.timestamp === 'string') {
-                    const d = new Date(testData.timestamp);
-                    testData.timestamp = { toDate: () => d };
-                } else if (!testData.timestamp) {
-                    testData.timestamp = { toDate: () => new Date() };
-                }
-
-                document.getElementById('progress-bar').style.width = "100%";
-                document.getElementById('progress-msg').innerText = "✨ 測試資料載入完成";
-
-                // [5] 模擬延遲延時感 (User Experience)，讓效果更真實
-                setTimeout(() => {
-                    // 更新上方的小型影片預覽卡片
-                    const infoBox = document.getElementById('pre-info');
-                    infoBox.classList.remove('hidden');
-                    document.getElementById('pre-thumb').src = testData.metadata.thumbnail;
-                    document.getElementById('pre-title').innerText = testData.metadata.title;
-                    document.getElementById('pre-channel').innerText = testData.metadata.channel;
-                    document.getElementById('pre-duration').innerText = testData.metadata.duration_text;
-
-                    // [6] 呼叫核心渲染函式：將分析內容畫在螢幕上
-                    updateUI(testData, "https://podcasts.apple.com/tw/");
-
-                    document.getElementById('loading').classList.add('hidden');
-                    document.getElementById('content').classList.remove('hidden');
-                    document.getElementById('task-status').innerText = "✅ 成功進入測試與對話模式";
-
-                    // [7] 啟動連動：設定測試 ID，讓點擊聊天球時，聊天功能知道現在是 DEMO 狀態
-                    window.currentChatTaskId = "test_demo_task";
-                    window.currentPodcastTitle = testData.title || "測試 Podcast";
-                    document.getElementById('chat-launcher').classList.remove('hidden'); // 顯示右下角懸浮球
-
-                }, 800);
-
-            } catch (err) {
-                alert("進入測試模式失敗 (請確認目錄中是否有 preview.json): \n" + err);
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('task-status').innerText = "❌ 測試模式啟動失敗";
-            }
-        }
-
-        // -- J07: 清空輸入框 --
         window.clearInput = () => {
             document.getElementById('sourceUrl').value = '';
             document.getElementById('task-status').innerText = '';
         };
 
-        // --- J08: 監聽 分析結果與進度 (for S04 載入狀態) ---
-        function listenToSpecificResult(taskId, originalUrl) {
-            // [A] 清理舊監聽：如果之前有正在跑的監聽器，先把它關掉，避免重複收到訊息
-            if (currentUnsubscribe) currentUnsubscribe();
+        // -- J06: 模擬演示模式 (串接 preview.json 與 Chat 對話) --
+        async function runDemoMode() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('content').classList.add('hidden');
+            document.getElementById('pre-info').classList.add('hidden');
+            document.getElementById('progress-bar').style.width = "50%";
+            document.getElementById('progress-msg').innerText = "📥 加載本地 Demo 預覽中...";
 
-            // 重置進度條 UI
+            try {
+                // 從本地 preview.json 讀取真實結構
+                const response = await fetch('preview.json');
+                if (!response.ok) throw new Error("找不到 preview.json");
+                const testData = await response.json();
+                // 為了相容預覽卡片，若測試檔案沒有提供 metadata 則代入預設值
+                if (!testData.metadata) {
+                    testData.metadata = {
+                        thumbnail: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/04/b5/eb/04b5ebdf-7072-21fc-5876-e5feb5ba3dac/mza_7653733142335128691.jpeg/300x300bb.webp",
+                        title: testData.title || "測試 Podcast (DEMO)",
+                        channel: "測試頻道", duration_text: "40:30"
+                    };
+                }
+                // 處理 Firestore 舊版時間與 JSON 時間相容性
+                if (testData.timestamp && typeof testData.timestamp === 'string') {
+                    const d = new Date(testData.timestamp);
+                    testData.timestamp = { toDate: () => d };
+                }
+
+                setTimeout(() => {
+                    updateUI(testData, "https://podcasts.apple.com/tw/");
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('content').classList.remove('hidden');
+                    window.currentChatTaskId = "test_demo_task";
+                    document.getElementById('chat-launcher').classList.remove('hidden');
+                }, 800);
+            } catch (err) { alert(err); document.getElementById('loading').classList.add('hidden'); }
+        }
+
+        // -- J08: 監聽 分析結果與進度 (for S04 載入狀態) --
+        function listenToSpecificResult(taskId, originalUrl) {
+            if (currentUnsubscribe) currentUnsubscribe();
             document.getElementById('progress-bar').style.width = "0%";
             document.getElementById('pre-info').classList.add('hidden');
 
-            // ⚡ 第一層監聽：監聽「任務過程」 (進度條、狀態文字、影片縮圖)
+            let resultSub = null;
             const taskSub = onSnapshot(doc(db, "tasks", taskId), (docSnap) => {
                 if (!docSnap.exists()) return;
                 const data = docSnap.data();
 
-                // 1. 錯誤處理：如果後端回報 status 是 failed，顯示錯誤詳情並停止監聽
                 if (data.status === "failed") {
                     document.getElementById('loading').classList.add('hidden');
-
-                    const rawError = data.error_msg || "";
-                    let friendlyMsg = "後端處理發生異常，請稍後再試";
-
-                    // 錯誤碼映射清單：將生硬的後端報錯轉化為看得懂的文字
-                    const errorMap = {
-                        "429": "[Groq] ⚠️ 額度達上限！請等候幾分鐘再試。",
-                        "ASPH": "[Groq] ⚠️ 每小時轉錄時數已達上限，請稍後再試。",
-                        "Quota": "[Gemini] ⚠️ API 次數或字數限制已滿，請等候一分鐘。",
-                        "Sign in to confirm": "[YouTube] 🔑 要求驗證身分，請聯繫管理員更新 Cookie。",
-                        "unavailable": "[YouTube] 🚫 影片目前無法播放 (刪除或地區限制)。",
-                        "timeout": "[System] 🕒 處理時間過長 (影片過長)，請手動重試。",
-                        "500": "[System] 💣 伺服器內部錯誤，請點擊重試。"
-                    };
-
-                    for (const key in errorMap) {
-                        if (rawError.includes(key)) {
-                            friendlyMsg = errorMap[key];
-                            break;
-                        }
-                    }
-
-                    alert(`❌ 任務失敗\n\n${friendlyMsg}\n\n(詳情: ${rawError.substring(0, 50)}...)`);
-                    taskSub(); // 停止監聽
-                    return;
+                    alert(`❌ 任務失敗: ${data.error_msg || "未知錯誤"}`);
+                    taskSub(); if (resultSub) resultSub(); return;
                 }
 
-                // 2. 更新進度：將後端傳回的 progress (0-100) 與 status_msg 畫在螢幕上
                 if (data.status_msg) document.getElementById('progress-msg').innerText = data.status_msg;
                 if (data.progress) document.getElementById('progress-bar').style.width = data.progress + "%";
 
-                // 3. 更新預覽：後端一旦抓到影片標題與縮圖 (metadata)，立刻顯示在中間卡片
                 if (data.metadata) {
                     const infoBox = document.getElementById('pre-info');
                     infoBox.classList.remove('hidden');
@@ -583,236 +506,154 @@
                     document.getElementById('pre-duration').innerText = data.metadata.duration_text || "";
                     lucide.createIcons();
                 }
+
+                // 🎯 關鍵優化：一旦 backend 填入唯一 transcriptId，立刻啟動單一文檔監聽
+                if (data.transcriptId && !resultSub) {
+                    console.log("🔗 已獲取分析引用位址，正在載入結果...");
+                    resultSub = onSnapshot(doc(db, "transcripts", data.transcriptId), (tSnap) => {
+                        if (!tSnap.exists()) return;
+                        const tData = tSnap.data();
+                        updateUI(tData, originalUrl);
+                        document.getElementById('loading').classList.add('hidden');
+                        document.getElementById('content').classList.remove('hidden');
+                        window.currentChatTaskId = taskId;
+                        document.getElementById('chat-launcher').classList.remove('hidden');
+                        document.getElementById('task-status').innerText = "分析完成！";
+                        taskSub(); resultSub();
+                    });
+                }
             });
-
-            // ⚡ 第二層監聽：監聽「最終結果」 (從 transcripts 資料夾找剛算完的結果)
-            const q = query(collection(db, "transcripts"), where("taskId", "==", taskId));
-            const resultSub = onSnapshot(q, (snapshot) => {
-                if (snapshot.empty) return; // 如果還沒算完，資料夾會是空的，直接跳出等下一次更新
-                const data = snapshot.docs[0].data();
-
-                // 4. 分析完畢：呼叫 updateUI 把最終的大腦分析渲染出來
-                updateUI(data, originalUrl);
-
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('content').classList.remove('hidden');
-
-                // 5. 權限交接：標記這是一個完成的任務，並顯示右下角的對話圓球
-                window.currentChatTaskId = taskId;
-                document.getElementById('chat-launcher').classList.remove('hidden');
-
-                document.getElementById('task-status').innerText = "分析完成！";
-
-                // 📢 最後：既然結果都拿到了，就關閉所有的即時監聽器以節省網路資源
-                taskSub();
-                resultSub();
-            });
-
-            // 將這兩個監聽器的關閉函式存入全域，方便下次點擊按鈕時清理
-            currentUnsubscribe = () => { taskSub(); resultSub(); };
+            currentUnsubscribe = () => { taskSub(); if (resultSub) resultSub(); };
         }
 
         // --- J09: 更新畫面顯示結果 ---
         function updateUI(data, originalUrl) {
+            if (data.metadata) {
+                const infoBox = document.getElementById('pre-info');
+                infoBox.classList.remove('hidden');
+                document.getElementById('pre-thumb').src = data.metadata.thumbnail || "";
+                document.getElementById('pre-title').innerText = data.metadata.title || "未知標題";
+                document.getElementById('pre-channel').innerText = data.metadata.channel || "未知頻道";
+                document.getElementById('pre-duration').innerText = data.metadata.duration_text || "";
+            }
+
             document.getElementById('display-title').innerText = data.title;
             document.getElementById('display-insight').innerText = data.investment_insight;
-            if (data.timestamp) document.getElementById('display-date').innerText = data.timestamp.toDate().toLocaleString();
+            if (data.timestamp) {
+                const d = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
+                document.getElementById('display-date').innerText = d.toLocaleString();
+            }
 
-            // 1. 渲染個股名單
             const stocksEl = document.getElementById('display-stocks');
             const stocksSection = document.getElementById('section-stocks');
             if (data.stocks && data.stocks.length > 0) {
                 stocksSection.classList.remove('hidden');
-                stocksEl.innerHTML = data.stocks.map(s => `
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-50 text-blue-600 border border-blue-100">
-                        # ${s}
-                    </span>
-                `).join('');
-            } else {
-                stocksSection.classList.add('hidden');
-            }
+                stocksEl.innerHTML = data.stocks.map(s => `<span class="px-3 py-1 rounded-full text-sm font-bold bg-blue-50 text-blue-600 border border-blue-100"># ${s}</span>`).join('');
+            } else { stocksSection.classList.add('hidden'); }
 
-            // 2. 渲染技術族群
             const sectorsEl = document.getElementById('display-sectors');
             const sectorsSection = document.getElementById('section-sectors');
             if (data.sectors && data.sectors.length > 0) {
                 sectorsSection.classList.remove('hidden');
-                sectorsEl.innerHTML = data.sectors.map(s => `
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-purple-50 text-purple-600 border border-purple-100">
-                        <i data-lucide="zap" class="size-3 mr-1"></i> ${s}
-                    </span>
-                `).join('');
-            } else {
-                sectorsSection.classList.add('hidden');
-            }
+                sectorsEl.innerHTML = data.sectors.map(s => `<span class="px-3 py-1 rounded-full text-sm font-bold bg-purple-50 text-purple-600 border border-purple-100">${s}</span>`).join('');
+            } else { sectorsSection.classList.add('hidden'); }
 
             const highlightsEl = document.getElementById('display-highlights');
-            // 💡 加入 || [] 防呆機制，確保不會因為找不到 highlights 而報錯
-            highlightsEl.innerHTML = (data.highlights || []).map(h => {
-                return `
-                <div class="group relative border-l-2 border-slate-100 pl-6 pb-2">
+            highlightsEl.innerHTML = (data.highlights || []).map(h => `
+                <div class="border-l-2 border-slate-100 pl-6 pb-2 relative">
                     <div class="absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-white bg-slate-200"></div>
-                    <div class="text-xs font-mono font-bold text-blue-500 mb-1 flex items-center">
-                        <i data-lucide="play-circle" class="size-3 mr-1"></i> ${h.timeStart}
-                    </div>
+                    <div class="text-xs font-mono font-bold text-blue-500 mb-1 flex items-center"><i data-lucide="play-circle" class="size-3 mr-1"></i> ${h.timeStart}</div>
                     <p class="text-slate-800 font-bold text-base">${h.desc}</p>
-                </div>`;
-            }).join('');
+                </div>`).join('');
 
-            // 資源下載與連結
             document.getElementById('download-srt').href = data.srt_url;
             document.getElementById('download-json').href = data.json_url || "#";
             document.getElementById('source-link').href = originalUrl;
-
             lucide.createIcons();
         }
 
-        // --- J10: Chat with Gemini 視窗開關 (S06懸浮圓球) ---
-        window.toggleChat = function () {
+        // -- J10: Chat with Gemini 視窗開關 (S06懸浮圓球) --
+        window.toggleChat = () => {
             const chatWindow = document.getElementById('chat-window');
-            const isClosed = chatWindow.classList.contains('translate-y-full');
-
-            if (isClosed) {
-                // 打開
-                chatWindow.classList.replace('translate-y-full', 'translate-y-0');
-            } else {
-                // 收折
-                chatWindow.classList.replace('translate-y-0', 'translate-y-full');
-            }
+            chatWindow.classList.toggle('translate-y-full');
+            chatWindow.classList.toggle('translate-y-0');
+            lucide.createIcons();
         };
 
-        // --- J11: Chat with Gemini 顯示訊息 (S07 對話視窗) ---
+        // -- J11: Chat with Gemini 顯示訊息 (S07 對話視窗) --
         function addMessageToUI(sender, text, isHtml = false) {
             const chatMessages = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
-
+            msgDiv.className = `flex flex-col mb-4 max-w-[85%] relative chat-bubble-fade ${sender === 'You' ? 'self-end ml-auto' : ''}`;
+            
             if (sender === 'You') {
-                msgDiv.className = 'flex flex-col mb-4 max-w-[85%] self-end ml-auto relative';
                 msgDiv.innerHTML = `
-                    <div class="flex items-baseline mb-1 justify-end">
-                        <span class="font-bold text-slate-800 text-sm ml-2">You</span>
-                    </div>
-                    <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-2 shadow-sm text-sm">
-                        ${text}
-                    </div>
-                `;
+                    <div class="text-right mb-1"><span class="font-bold text-slate-800 text-xs text-opacity-50">You</span></div>
+                    <div class="bg-emerald-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-lg shadow-emerald-600/10 text-sm font-medium">${text}</div>`;
             } else {
-                // Gemini HTML
-                // 將 markdown 換行轉成 br
-                const formattedText = isHtml ? text : text.replace(/\\n/g, '<br>');
-                msgDiv.className = 'flex flex-col mb-4 max-w-[85%] relative';
+                const formattedText = isHtml ? text : text.replace(/\n/g, '<br>');
                 msgDiv.innerHTML = `
-                    <div class="flex items-baseline mb-1">
-                        <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
-                    </div>
-                    <div class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm" style="word-wrap: break-word;">
-                        ${formattedText}
-                    </div>
-                `;
+                    <div class="mb-1"><span class="font-bold text-slate-800 text-xs text-opacity-50">Gemini</span></div>
+                    <div class="bg-white border border-slate-100 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm text-sm leading-relaxed" style="word-wrap: break-word;">${formattedText}</div>`;
             }
-
             chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight; // 自動向下滾動
+            chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
         }
 
-        // --- J12: Chat with Gemini 發送訊息 (S07 對話視窗) ---
-        window.sendChatMessage = async function (e) {
-            // [1] 防止表單預設重新整理行為
+        // -- J12: Chat with Gemini 發送訊息 (S07 對話視窗) --
+        window.sendChatMessage = async (e) => {
             e.preventDefault();
             const inputEl = document.getElementById('chat-input');
             const submitBtn = document.getElementById('chat-submit-btn');
             const message = inputEl.value.trim();
             const taskId = window.currentChatTaskId;
-
             if (!message || !taskId) return;
 
-            // [2] 立即顯示使用者訊息，並清空輸入框
             addMessageToUI('You', message);
-            inputEl.value = '';
+            inputEl.value = ''; inputEl.disabled = true;
+            submitBtn.disabled = true;
 
-            // [3] UI 互動限制：禁用輸入並顯示旋轉載入圖示，防止重複點擊
-            inputEl.disabled = true;
-            submitBtn.innerHTML = '<i class="lucide lucide-loader animate-spin size-4 -ml-0.5 mt-0.5"></i>';
             const chatMessages = document.getElementById('chat-messages');
-
-            // [4] 顯示「Gemini 正在思考」的動畫指示器
             const loadingDiv = document.createElement('div');
             loadingDiv.id = 'chat-typing-indicator';
             loadingDiv.className = 'flex flex-col mb-4 max-w-[85%] relative';
-            loadingDiv.innerHTML = `
-                <div class="flex items-baseline mb-1">
-                    <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
-                </div>
-                <div class="bg-white border border-slate-200 text-slate-400 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm italic">
-                    <span id="chat-loading-text">正在思考與閱讀逐字稿...</span>
-                </div>
-            `;
+            loadingDiv.innerHTML = `<div class="mb-1"><span class="font-bold text-slate-800 text-sm">Gemini</span></div>
+                                   <div class="bg-white border text-slate-400 rounded-2xl rounded-tl-sm px-4 py-2 text-sm italic">正在思考與閱讀逐字稿...</div>`;
             chatMessages.appendChild(loadingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // [5] 設定安全定時器：若 10 秒沒回，由前端主動提醒使用者伺服器擁擠
-            const loadingTimer = setTimeout(() => {
-                const loadingText = document.getElementById('chat-loading-text');
-                if (loadingText) {
-                    loadingText.innerHTML = 'AI 伺服器目前較擁擠，正在努力重新連線中，請稍候...';
-                    loadingText.classList.add('text-orange-500');
-                }
-            }, 10000);
-
-            // [6] [TEST模式攔截]：如果是測試任務，跳過 API 直接回傳寫好的模擬內容
             if (taskId === 'test_demo_task') {
                 setTimeout(() => {
-                    const indicator = document.getElementById('chat-typing-indicator');
-                    if (indicator) indicator.remove();
-                    addMessageToUI('Gemini', '這是一個來自預覽模式的模擬回覆。在大腦分析中，我們可以看到這集節目的核心重點在於 AI 的未來與半導體軟硬體整合的趨勢。<br><br>如果您有具體的問題，歡迎在正式模式下進行提問！');
-                    inputEl.disabled = false;
-                    submitBtn.innerHTML = '<i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>';
-                    lucide.createIcons();
-                    inputEl.focus();
-                    clearTimeout(loadingTimer);
-                }, 1500);
+                    document.getElementById('chat-typing-indicator')?.remove();
+                    addMessageToUI('Gemini', '這是一個來自預覽模式的模擬回覆。<br>在雲端分析大腦中，我們可以看到這集節目的核心重點。<br>如果您有具體的問題，歡迎在正式模式下進行提問！');
+                    inputEl.disabled = false; submitBtn.disabled = false;
+                }, 1000);
                 return;
             }
 
             try {
-                // [7] 發送網路請求 (POST) 到本地端的 /chat 介面
-                const response = await fetch('http://localhost:10000/chat', {
+                const resp = await fetch('http://localhost:10000/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ taskId: taskId, message: message })
+                    body: JSON.stringify({ taskId, message })
                 });
-
-                clearTimeout(loadingTimer); // 拿到回應後，立刻清除 10 秒定時器
-                const data = await response.json();
-
-                // 移除「思考中」提示
-                const indicator = document.getElementById('chat-typing-indicator');
-                if (indicator) indicator.remove();
-
-                // [8] 正確處理：將 AI 回傳的純文字進行簡單的 Markdown 格式化 (換行與粗體)
+                const data = await resp.json();
+                document.getElementById('chat-typing-indicator')?.remove();
                 if (data.status === 'success') {
-                    let reply = data.reply.replace(/\n(.*)/g, "<br>$1"); // 換行符轉標籤
-                    reply = reply.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); // 粗體轉標籤
-                    addMessageToUI('Gemini', reply, true);
+                    addMessageToUI('Gemini', data.reply);
                 } else {
-                    addMessageToUI('Gemini', '<span class="text-red-500">❌ ' + (data.message || 'API 發生錯誤') + '</span>', true);
+                    addMessageToUI('Gemini', '❌ 錯誤: ' + data.message);
                 }
-            } catch (error) {
-                // [9] 異常處理：若連不到 10000 端口，提示檢查本地 Python 腳本
-                const indicator = document.getElementById('chat-typing-indicator');
-                if (indicator) indicator.remove();
-                addMessageToUI('Gemini', '<span class="text-red-500">❌ 無法連線到後端，請確認 main_local.py 正在運行</span>', true);
+            } catch (err) {
+                document.getElementById('chat-typing-indicator')?.remove();
+                addMessageToUI('Gemini', '❌ 無法連線至本地後端，請確認 python 客戶端是否已啟動。');
             } finally {
-                // 最後無論成功失敗，都要恢復 UI 元件可用性
-                inputEl.disabled = false;
-                submitBtn.innerHTML = '<i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>';
+                inputEl.disabled = false; submitBtn.disabled = false; inputEl.focus();
                 lucide.createIcons();
-                inputEl.focus();
             }
         };
-        // --- J13: 載入時自動初始化圖示 (S07 對話視窗) ---
-        lucide.createIcons();
 
+        document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
     </script>
 </body>
 
