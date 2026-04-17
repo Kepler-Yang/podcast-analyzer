@@ -17,7 +17,8 @@ from dotenv import load_dotenv  # 🚀 [新增] 載入環境變數工具
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # 啟動時自動從 .env 檔案讀取設定值
-load_dotenv()
+base_dir = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(base_dir, ".env"))
 
 # **GEMINI_MODEL 鎖定**：除非 USER 提出，否則禁止修改此參數。
 GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
@@ -116,15 +117,12 @@ def preprocess_srt_to_seconds(srt_content):
     return "\n".join(processed)
 
 
-def process_audio_pipeline(url, task_id, db):
-    """核心處理流程"""
-    temp_dir = os.path.join(tempfile.gettempdir(), f"whisge_temp_{task_id}")
+def process_audio_pipeline(url, task_id, db, temp_dir):
+    """核心處理流程：下載音檔 + Whisper 轉錄 (不含 Gemini 分析)"""
     os.makedirs(temp_dir, exist_ok=True)
 
     # 先預給一個基本檔名，拿到 title 後會更新
     local_srt = os.path.join(temp_dir, "transcript.srt")
-    local_json = os.path.join(temp_dir, "analysis.json")
-    file_base_name = f"podcast_{task_id}"
 
     def update_task_status(msg, progress):
         print(f"🗳️ [{progress}%] {msg}")
@@ -217,30 +215,37 @@ def process_audio_pipeline(url, task_id, db):
     safe_abr = min(128, max(16, target_bitrate_kbps))
     print(f"📉 根據時長 ({duration_sec}s) 調整目標位元率為: {safe_abr}kbps")
 
+    # 🔍 [新增] 檢查本地是否已有先前下載的音檔 (斷點續跑)
     final_audio = None
+    audio_extensions = [".m4a", ".opus", ".mp3", ".webm", ".ogg", ".mp4"]
+    for f in os.listdir(temp_dir):
+        if any(f.endswith(ext) for ext in audio_extensions) and f.startswith("audio"):
+            final_audio = os.path.join(temp_dir, f)
+            file_size_mb = os.path.getsize(final_audio) / (1024 * 1024)
+            print(f"🎯 偵測到本地快取音檔: {f} ({file_size_mb:.2f} MB)，跳過下載步驟！")
+            update_task_status(f"🎯 偵測到本地快取音檔 ({file_size_mb:.1f}MB)，跳過下載！", 50)
+            break
+
     is_apple_podcast = "apple.com" in url
 
-    # [策略 A] 長篇 Apple Podcast 優化：直接 ffmpeg 串流轉碼 (節省空間 + 保持穩定)
-    if is_apple_podcast and duration_sec > 900:
+    # [策略 A] 長篇 Apple Podcast 優化：直接 ffmpeg 串流下載 (本地版不需壓縮)
+    if not final_audio and is_apple_podcast and duration_sec > 900:
         mins = int(duration_sec // 60)
         update_task_status(
-            f"🎙️ [2/5] 偵測到長篇 Podcast ({mins}分鐘)，啟動串流轉碼下載中... (可能需要 1-3 分鐘，請稍候)",
+            f"🎙️ [2/5] 偵測到長篇 Podcast ({mins}分鐘)，串流下載中... (可能需要 1-3 分鐘，請稍候)",
             30,
         )
         audio_url = info.get("url")
-        final_audio = os.path.join(temp_dir, "audio.opus")
+        final_audio = os.path.join(temp_dir, "audio.mp3")
 
+        # 本地版不受 25MB 限制，直接 copy 原始音軌，不轉碼
         ffmpeg_cmd = [
             "ffmpeg",
             "-i",
             audio_url,
             "-vn",
             "-acodec",
-            "libopus",
-            "-ac",
-            "1",  # 強制單聲道，節省位元率
-            "-b:a",
-            f"{safe_abr}k",
+            "copy",   # 直接複製，不轉碼 (避免 libopus 不存在的問題)
             "-y",
             final_audio,
         ]
@@ -313,21 +318,41 @@ def process_audio_pipeline(url, task_id, db):
         with open(local_srt, "w", encoding="utf-8") as f:
             f.write(trans_srt)
 
-    # ==========================================
-    # [Step 4] 呼叫 Gemini 進行 AI 分析
-    # ==========================================
-    update_task_status(
-        "🧠 [4/5] Gemini 正在閱讀內容並撰寫深度分析... (預計 20-40 秒)", 80
-    )
+    # ✅ Pipeline 結束：回傳 SRT 結果，Gemini 分析由 main_local.py 控制
+    return {
+        "srt_path": local_srt,
+        "audio_path": final_audio,
+        "srt_content": trans_srt,
+    }
+
+
+def run_gemini_analysis(srt_content, output_json_path, task_id=None, db=None):
+    """
+    獨立的 Gemini AI 分析函式。
+    可由完整 pipeline 呼叫，也可由 main_local.py 在有 SRT 快取時直接呼叫。
+    :param srt_content: SRT 逐字稿的純文字內容
+    :param output_json_path: JSON 分析結果的本地存檔路徑
+    :param task_id: Firebase 任務 ID (用於更新進度，可選)
+    :param db: Firestore client (用於更新進度，可選)
+    :return: 分析結果 dict
+    """
+    def update_status(msg, progress):
+        print(f"🗳️ [{progress}%] {msg}")
+        if db and task_id:
+            db.collection("tasks").document(task_id).update(
+                {"status_msg": msg, "progress": progress}
+            )
+
+    update_status("🧠 [4/5] Gemini 正在閱讀內容並撰寫深度分析... (預計 20-40 秒)", 80)
 
     # 🚨 資安防護：強制從 .env 讀取，嚴禁將 API Key 寫死在程式碼中！
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("❌ 偵測不到 GEMINI_API_KEY，請確認 .env 檔案已設定正確。")
-    
+
     local_gemini_client = genai.Client(api_key=api_key)
 
-    clean_content = preprocess_srt_to_seconds(trans_srt)
+    clean_content = preprocess_srt_to_seconds(srt_content)
     response = local_gemini_client.models.generate_content(
         model=GEMINI_MODEL,
         contents=f"待處理逐字稿：\n{clean_content}\n\n請根據以上內容提供深度分析。\n\n【⚠️ 強制規定】: 你的所有回覆、標題與分析內容，必須使用嚴謹的「台灣繁體中文 (zh-TW)」輸出，絕對嚴禁出現任何簡體字與大陸用語。",
@@ -340,7 +365,7 @@ def process_audio_pipeline(url, task_id, db):
     )
 
     # [Step 5] 解析與存檔
-    update_task_status("📊 [5/5] 正在整理最後結果並存入雲端... (即將完成)", 95)
+    update_status("📊 [5/5] 正在整理最後結果並存入雲端... (即將完成)", 95)
     try:
         structured_data = AnalysisResult.model_validate_json(response.text)
         json_data = structured_data.model_dump()
@@ -348,7 +373,7 @@ def process_audio_pipeline(url, task_id, db):
         match = re.search(r"\{.*\}", response.text, re.DOTALL)
         json_data = json.loads(match.group(0) if match else response.text.strip())
 
-    with open(local_json, "w", encoding="utf-8") as f:
+    with open(output_json_path, "w", encoding="utf-8") as f:
         json.dump(json_data, f, ensure_ascii=False, indent=2)
 
-    return local_srt, local_json, json_data, final_audio
+    return json_data

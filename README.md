@@ -51,3 +51,57 @@ python main_local.py
 2. `python 腳本群`: 所有的 `.py` 代碼目前已無寫死的私人 Key (原先存在的 Gemini Key 已被清除，全面掛載 env)，因此**能安全上傳**。
 3. `requirements.txt, .example`: 皆**安全可上傳**。
 4. **警告禁止上傳清單**：真正有資安疑慮的只有 `.env` 與 `serviceAccountKey.json`，請確認它們靜靜躺在 `.gitignore` 內。
+
+---
+
+## 📋 2026-04-17 架構重構紀錄
+
+### 一、啟動預檢機制 (`preflight_check`)
+- Python 一啟動就驗證 `serviceAccountKey.json` 和 `GEMINI_API_KEY` 是否存在。
+- 未通過直接以友善提示終止程式（`sys.exit(1)`），不會拋出原始 Python traceback。
+- `firebase_storage_local.py` 的模組載入階段也加入相同的檔案存在檢查。
+
+### 二、三層快取機制（斷點續跑）
+承接任務後，依序檢查三層快取，能從哪裡接就從哪裡接：
+
+| Layer | 檢查目標 | 命中後的動作 |
+|-------|---------|------------|
+| Layer 1 | Firestore `transcripts` 集合 (用 `originalUrl` 比對) | 直接複製舊結果回傳前端 (0 秒) |
+| Layer 2 | Firebase Storage `transcripts/{url_hash}/` 資料夾 | 下載 SRT → 跳到 Gemini 分析 |
+| Layer 3 | 本地暫存目錄 `%TEMP%/whisge_{url_hash}/` | 跳過 yt-dlp 下載 → Whisper 轉錄 |
+| Layer 4 | 都沒有 | 從頭開始 (yt-dlp → Whisper → Gemini) |
+
+### 三、各步驟完成即上傳
+- **SRT 轉錄完成** → 立即上傳至 Firebase Storage（即使 Gemini 後續失敗，SRT 已安全保存）。
+- **JSON 分析完成** → 立即上傳至 Firebase Storage。
+- **失敗不刪檔**：只有全部成功才清理本地暫存目錄，失敗時保留所有檔案供下次續跑。
+
+### 四、統一 Storage 路徑（跨版本共用）
+本地版與雲端版 (Render) 統一使用 **URL 的 MD5 hash** 作為 Storage 資料夾 key：
+
+```
+Firebase Storage
+└── transcripts/
+    └── {MD5(url)}/            ← 同一 URL 永遠相同，跨版本可復用
+        ├── {safe_title}.srt   ← 檔名使用 yt-dlp 解讀的影片標題
+        └── {safe_title}.json  ← 檔名使用 yt-dlp 解讀的影片標題
+```
+
+**效果**：本地版跑完的 SRT/JSON，雲端版也能在 Layer 2 快取中找到，反之亦然。避免同一 Podcast 在不同環境重複下載與分析。
+
+### 五、改動檔案清單
+
+| 檔案 | 改動摘要 |
+|------|---------|
+| `main_local.py` | 新增 `preflight_check()`、三層快取邏輯、SRT/JSON 即完即傳、失敗不刪檔 |
+| `processor_local.py` | 接收外部 `temp_dir`、下載前檢查本地音檔快取、Gemini 抽出為獨立函式 `run_gemini_analysis()` |
+| `firebase_storage_local.py` | 新增 `url_to_storage_key()`、`find_file_in_storage()`、`download_file_from_storage()`、`get_signed_url()`、啟動時檔案存在檢查 |
+
+### 六、資料存放架構
+
+| 資料 | Firebase Storage (檔案) | Firestore (資料庫) |
+|------|------|------|
+| SRT 逐字稿 | ✅ 完整 `.srt` 檔案 | ❌ |
+| JSON 分析結果 | ✅ 完整 `.json` 檔案 (備份用) | ✅ 拆開存各欄位 (前端渲染用) |
+| metadata (標題/頻道/時長) | ❌ | ✅ tasks + transcripts 集合 |
+
