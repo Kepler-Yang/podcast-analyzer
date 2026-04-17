@@ -11,6 +11,7 @@ python-dotenv==1.0.1
 
 # --- 語言模型 (Google Gemini) ---
 google-genai==1.66.0
+pydantic>=2.0.0
 
 # --- OpenAI Whisper 轉錄工具 ---
 # 👉 請先手動安裝您的顯卡對應版本 PyTorch，才能發揮 GPU 效能！
