@@ -32,11 +32,11 @@
                 </button>
                 <div id="status-indicator" class="flex items-center text-sm text-slate-400">
                     <span id="ping-dot" class="relative flex h-3 w-3 mr-2">
-                        <span
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        <span id="ping-pulse"
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                        <span id="ping-led" class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
                     </span>
-                    系統連線中
+                    <span id="status-text">正在檢查連線...</span>
                 </div>
             </div>
         </div>
@@ -269,6 +269,55 @@
             modal.classList.toggle('hidden');
             lucide.createIcons();
         };
+
+        // --- 實質連線狀態檢查 (Heartbeat 監聽) ---
+        const checkBackendStatus = () => {
+            const statusText = document.getElementById('status-text');
+            const pingPulse = document.getElementById('ping-pulse');
+            const pingLed = document.getElementById('ping-led');
+
+            onSnapshot(doc(db, "system_status", "local_engine"), (snapshot) => {
+                if (!snapshot.exists()) {
+                    setOffline();
+                    return;
+                }
+
+                const data = snapshot.data();
+                if (!data.last_seen) {
+                    setOffline();
+                    return;
+                }
+
+                // 判斷是否在 60 秒內有更新 (後端每 30 秒更新一次)
+                const lastSeen = data.last_seen.toDate().getTime();
+                const now = new Date().getTime();
+                const diffSec = (now - lastSeen) / 1000;
+
+                if (diffSec < 60) {
+                    statusText.innerText = "本地後端已連線";
+                    statusText.classList.remove('text-slate-400', 'text-red-400');
+                    statusText.classList.add('text-emerald-400');
+                    pingPulse.classList.replace('bg-orange-400', 'bg-green-400');
+                    pingPulse.classList.replace('bg-red-400', 'bg-green-400');
+                    pingLed.classList.replace('bg-orange-500', 'bg-green-500');
+                    pingLed.classList.replace('bg-red-500', 'bg-green-500');
+                } else {
+                    setOffline();
+                }
+            });
+
+            function setOffline() {
+                statusText.innerText = "本地後端未啟動";
+                statusText.classList.remove('text-slate-400', 'text-emerald-400');
+                statusText.classList.add('text-red-400');
+                pingPulse.classList.remove('bg-green-400', 'bg-orange-400');
+                pingPulse.classList.add('bg-red-400');
+                pingLed.classList.remove('bg-green-500', 'bg-orange-500');
+                pingLed.classList.add('bg-red-500');
+            }
+        };
+
+        checkBackendStatus();
 
         // 控制「免費仔辛酸血淚」區塊展開/收合
         window.toggleFrugalSection = () => {
