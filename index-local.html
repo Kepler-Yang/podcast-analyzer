@@ -95,7 +95,8 @@
 
             <!-- 動態進度條 -->
             <div class="w-full max-w-xs h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div id="progress-bar" class="h-full bg-emerald-600 transition-all duration-500" style="width: 0%"></div>
+                <div id="progress-bar" class="h-full bg-emerald-600 transition-all duration-500" style="width: 0%">
+                </div>
             </div>
         </div>
 
@@ -173,8 +174,11 @@
 
                 <!-- 💬 Chat with Gemini 啟動按鈕 (預設隱藏，分析完成後顯示) -->
                 <div id="chat-launcher" class="hidden mt-8">
-                    <button onclick="toggleChat()" class="w-full relative group overflow-hidden rounded-2xl shadow-lg border border-slate-200 transition-all hover:shadow-xl">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-transform group-hover:scale-[1.02]"></div>
+                    <button onclick="toggleChat()"
+                        class="w-full relative group overflow-hidden rounded-2xl shadow-lg border border-slate-200 transition-all hover:shadow-xl">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-transform group-hover:scale-[1.02]">
+                        </div>
                         <div class="relative flex items-center justify-between p-6">
                             <div class="flex items-center text-white">
                                 <div class="bg-white/20 p-3 rounded-full mr-4 backdrop-blur-sm">
@@ -185,7 +189,8 @@
                                     <p class="text-blue-100 text-sm mt-1">針對這集內容繼續追問 Gemini AI</p>
                                 </div>
                             </div>
-                            <i data-lucide="chevron-right" class="size-6 text-white opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                            <i data-lucide="chevron-right"
+                                class="size-6 text-white opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         </div>
                     </button>
                 </div>
@@ -195,14 +200,17 @@
     </main>
 
     <!-- 💬 AdminLTE 風格的 Direct Chat 對話視窗 -->
-    <div id="chat-window" class="fixed bottom-0 right-0 w-full md:w-[450px] bg-white border-t border-l border-slate-200 shadow-2xl flex flex-col z-50 transition-transform duration-300 transform translate-y-full" style="height: 600px; max-height: 80vh; border-top-left-radius: 1rem;">
-        
+    <div id="chat-window"
+        class="fixed bottom-0 right-0 w-full md:w-[450px] bg-white border-t border-l border-slate-200 shadow-2xl flex flex-col z-50 transition-transform duration-300 transform translate-y-full"
+        style="height: 600px; max-height: 80vh; border-top-left-radius: 1rem;">
+
         <!-- Header -->
-        <div class="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-4 flex justify-between items-center rounded-tl-2xl cursor-pointer" onclick="toggleChat()">
+        <div class="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-4 flex justify-between items-center rounded-tl-2xl cursor-pointer"
+            onclick="toggleChat()">
             <div class="flex items-center">
                 <i data-lucide="bot" class="mr-2 size-5 text-blue-400"></i>
                 <h3 class="font-bold text-md">Gemini 大腦助手</h3>
-                <span class="ml-3 px-2 py-0.5 text-xs bg-slate-600 rounded-full">連線中</span>
+
             </div>
             <button class="focus:outline-none hover:bg-slate-600 p-1 rounded transition-colors">
                 <i data-lucide="chevron-down" class="size-5"></i>
@@ -216,7 +224,8 @@
                 <div class="flex items-baseline mb-1">
                     <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
                 </div>
-                <div class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm">
+                <div
+                    class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm">
                     嗨！我已經消化完這集 Podcast 的所有內容了。關於這集，你有什麼想更深入了解的嗎？
                 </div>
             </div>
@@ -225,8 +234,11 @@
         <!-- Chat Input Area -->
         <div class="p-3 border-t bg-white">
             <form id="chat-form" class="relative flex items-center" onsubmit="sendChatMessage(event)">
-                <input type="text" id="chat-input" class="w-full bg-slate-100 border-none rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type Message ..." autocomplete="off">
-                <button type="submit" id="chat-submit-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 transition-colors focus:outline-none">
+                <input type="text" id="chat-input"
+                    class="w-full bg-slate-100 border-none rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Type Message ..." autocomplete="off">
+                <button type="submit" id="chat-submit-btn"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 transition-colors focus:outline-none">
                     <i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>
                 </button>
             </form>
@@ -254,7 +266,8 @@
                                 class="bg-emerald-100 text-emerald-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">1</span>
                             前端發起請求 (HTML / GitHub Pages)</h4>
                         <p class="text-slate-600 mt-2 text-sm leading-relaxed">使用者輸入網址後，JavaScript 將帶有暗號的任務寫入
-                            <strong>Firebase</strong> 的 <code>tasks</code> 集合（狀態設定為 <code>pending_local</code>），防止雲端伺服器搶單。
+                            <strong>Firebase</strong> 的 <code>tasks</code> 集合（狀態設定為
+                            <code>pending_local</code>），防止雲端伺服器搶單。
                         </p>
                     </div>
 
@@ -270,7 +283,9 @@
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">3</span>
                             後端運算引擎 (Local 本機端 GPU)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">您本機的 Python 伺服器發現 <code>pending_local</code> 任務後，便會無視一切檔案大小限制，透過 yt-dlp 暴力下載，接著調用本地顯示卡的 CUDA 算力給 OpenAI Whisper 轉錄 ➔ 最後交由 Gemini AI 產出高純度分析。
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">您本機的 Python 伺服器發現
+                            <code>pending_local</code> 任務後，便會無視一切檔案大小限制，透過 yt-dlp 暴力下載，接著調用本地顯示卡的 CUDA 算力給 OpenAI
+                            Whisper 轉錄 ➔ 最後交由 Gemini AI 產出高純度分析。
                         </p>
                     </div>
 
@@ -286,7 +301,8 @@
                         <h4 class="font-bold flex items-center text-lg m-0"><span
                                 class="bg-emerald-100 text-emerald-700 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-sm">5</span>
                             結果回傳前端 (Firebase -> HTML)</h4>
-                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">本地腳本將最後的分析結果寫回 Firebase。此時網頁的監聽器立刻捕捉到變動，隨即渲染這份來自本地硬體的心血結晶給您！
+                        <p class="text-slate-600 mt-2 text-sm leading-relaxed">本地腳本將最後的分析結果寫回
+                            Firebase。此時網頁的監聽器立刻捕捉到變動，隨即渲染這份來自本地硬體的心血結晶給您！
                         </p>
                     </div>
                 </div>
@@ -579,7 +595,7 @@
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
-                
+
                 // 顯示 Chat Launcher，將 taskId 綁定給全域變數供對話使用
                 window.currentChatTaskId = taskId;
                 document.getElementById('chat-launcher').classList.remove('hidden');
@@ -651,10 +667,10 @@
         // ==========================================
         // 💬 Chat with Gemini 邏輯
         // ==========================================
-        window.toggleChat = function() {
+        window.toggleChat = function () {
             const chatWindow = document.getElementById('chat-window');
             const isClosed = chatWindow.classList.contains('translate-y-full');
-            
+
             if (isClosed) {
                 // 打開
                 chatWindow.classList.replace('translate-y-full', 'translate-y-0');
@@ -667,7 +683,7 @@
         function addMessageToUI(sender, text, isHtml = false) {
             const chatMessages = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
-            
+
             if (sender === 'You') {
                 msgDiv.className = 'flex flex-col mb-4 max-w-[85%] self-end ml-auto relative';
                 msgDiv.innerHTML = `
@@ -692,12 +708,12 @@
                     </div>
                 `;
             }
-            
+
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight; // 自動向下滾動
         }
 
-        window.sendChatMessage = async function(e) {
+        window.sendChatMessage = async function (e) {
             e.preventDefault();
             const inputEl = document.getElementById('chat-input');
             const submitBtn = document.getElementById('chat-submit-btn');
@@ -709,12 +725,12 @@
             // 1. 顯示使用者訊息
             addMessageToUI('You', message);
             inputEl.value = '';
-            
+
             // 2. 顯示等待中 UI
             inputEl.disabled = true;
             submitBtn.innerHTML = '<i class="lucide lucide-loader animate-spin size-4 -ml-0.5 mt-0.5"></i>';
             const chatMessages = document.getElementById('chat-messages');
-            
+
             // 新增暫時的輸入指示器
             const loadingDiv = document.createElement('div');
             loadingDiv.id = 'chat-typing-indicator';
@@ -743,7 +759,7 @@
             if (taskId === 'test_demo_task') {
                 setTimeout(() => {
                     const indicator = document.getElementById('chat-typing-indicator');
-                    if(indicator) indicator.remove();
+                    if (indicator) indicator.remove();
                     addMessageToUI('Gemini', '這是一個來自預覽模式的模擬回覆。在大腦分析中，我們可以看到這集節目的核心重點在於 AI 的未來與半導體軟硬體整合的趨勢。<br><br>如果您有具體的問題，歡迎在正式模式下進行提問！');
                     inputEl.disabled = false;
                     submitBtn.innerHTML = '<i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>';
@@ -764,14 +780,14 @@
 
                 clearTimeout(loadingTimer); // 成功拿到結果，清除定時器
                 const data = await response.json();
-                
+
                 // 移除 typing indicator
                 const indicator = document.getElementById('chat-typing-indicator');
-                if(indicator) indicator.remove();
+                if (indicator) indicator.remove();
 
                 if (data.status === 'success') {
                     // 回收換行符號
-                    let reply = data.reply.replace(/\n(.*)/g, "<br>$1"); 
+                    let reply = data.reply.replace(/\n(.*)/g, "<br>$1");
                     // 為了粗體等 markdown 也替換
                     reply = reply.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
                     addMessageToUI('Gemini', reply, true);
@@ -780,7 +796,7 @@
                 }
             } catch (error) {
                 const indicator = document.getElementById('chat-typing-indicator');
-                if(indicator) indicator.remove();
+                if (indicator) indicator.remove();
                 addMessageToUI('Gemini', '<span class="text-red-500">❌ 無法連線到後端，請確認 main_local.py 正在運行</span>', true);
             } finally {
                 inputEl.disabled = false;
