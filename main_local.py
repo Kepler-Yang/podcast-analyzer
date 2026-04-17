@@ -51,6 +51,27 @@ print("✅ 系統初始化完成！")
 # ==========================================
 # [一.五、 啟動預檢]
 # ==========================================
+import threading
+
+# ... (現有代碼)
+
+def start_heartbeat():
+    """定期更新心跳，讓前端知道後端在線"""
+    def heartbeat_loop():
+        print("💓 心跳服務已啟動")
+        while True:
+            try:
+                db.collection("system_status").document("local_engine").set({
+                    "last_seen": firestore.SERVER_TIMESTAMP,
+                    "status": "online"
+                })
+            except Exception as e:
+                print(f"⚠️ 心跳更新失敗: {e}")
+            time.sleep(30)
+    
+    t = threading.Thread(target=heartbeat_loop, daemon=True)
+    t.start()
+
 def preflight_check():
     """
     啟動時預先檢查所有必要的環境設定。
@@ -142,8 +163,11 @@ def handle_new_task(task_id, task_data):
                 )
 
             new_transcript_data = old_data.copy()
-            new_transcript_data["taskId"] = task_id  # 👈 換成現在這個任務的 ID
-            new_transcript_data["timestamp"] = firestore.SERVER_TIMESTAMP  # 更新時間
+            new_transcript_data["taskId"] = task_id  # 換成現在這個任務的 ID
+            
+            # 🚀 [優化] 保留原始分析時間，不要用 SERVER_TIMESTAMP 覆蓋
+            if "timestamp" not in new_transcript_data:
+                new_transcript_data["timestamp"] = firestore.SERVER_TIMESTAMP
 
             # 寫入一筆新的記錄到 transcripts 集合
             new_doc_ref = db.collection("transcripts").add(new_transcript_data)
@@ -362,6 +386,9 @@ def run_server():
 if __name__ == "__main__":
     # 🔍 啟動預檢：確認所有必要的環境設定
     preflight_check()
+
+    # 👉 啟動 Firestore 心跳服務 (讓前端能偵測後端是否在線)
+    start_heartbeat()
 
     print("\n📡 系統已啟動，正在背景監聽新任務...")
 
