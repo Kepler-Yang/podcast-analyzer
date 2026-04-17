@@ -51,9 +51,15 @@ def upload_file_to_storage(local_path, cloud_path):
         file_name = os.path.basename(local_path)
         blob = bucket.blob(cloud_path)
 
-        # 3. 上傳檔案
+        # 3. 上傳檔案 (設定編碼以防瀏覽器開啟時亂碼)
+        content_type = None
+        if local_path.lower().endswith(".srt"):
+            content_type = "text/plain; charset=utf-8"
+        elif local_path.lower().endswith(".json"):
+            content_type = "application/json; charset=utf-8"
+
         print(f"📤 正在上傳 {file_name} 到 Firebase Storage ({cloud_path})...")
-        blob.upload_from_filename(local_path)
+        blob.upload_from_filename(local_path, content_type=content_type)
 
         # 4. 產生簽署網址 (Signed URL) - 設定有效期限為 100 年 (約等於永久)
         url = blob.generate_signed_url(expiration=timedelta(days=36500))
