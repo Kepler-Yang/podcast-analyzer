@@ -10,7 +10,7 @@ from processor_local import preprocess_srt_to_seconds, GEMINI_MODEL
 active_chat_sessions = {}
 
 def handle_chat_request(db, data):
-    """處理與 Gemini 的對話請求 (從 main_local.py 分離)"""
+    """處理與 Gemini 的對話請求"""
     try:
         if not data:
             return jsonify({"status": "error", "message": "無效的請求數據"}), 400
@@ -103,7 +103,7 @@ def handle_chat_request(db, data):
             system_instruction = (
                 "你是一個專業的 Podcast 分析助手。以下是你需要了解的該集 Podcast 完整逐字稿。\n\n"
                 f"<podcast_transcript>\n{clean_content}\n</podcast_transcript>\n\n"
-                "請根據這份逐字稿詳盡且專業地回答使用者的問題。你的回答必須完全使用「台灣繁體中文 (zh-TW)」。\n\n"
+                "請根據這份逐字稿的內容，專業地回答使用者的問題。你的回答必須完全使用「台灣繁體中文 (zh-TW)」。\n\n"
                 "SRT逐字稿名詞修正：SRT是使用whisper速聽轉錄，因此會有錯字，請你在回答前需要先校正錯字\n"
                 "常見人名清單：謝孟恭, 股癌, 游庭皓, 兆華與股惑仔, 李兆華, 阿格力, 廖婉婷, 林漢偉, 陳唯泰, 蔡明翰, 黃豐凱, 股魚, 艾綸, 林信富, 紀緯明, 陳威良, 謝富旭, 楊雲翔, 張捷, 楚狂人。\n\n"
             )
