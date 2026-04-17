@@ -157,6 +157,12 @@
                                 (.srt)</span>
                             <i data-lucide="external-link" class="size-4 opacity-50"></i>
                         </a>
+                        <a id="download-json" href="#" target="_blank"
+                            class="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors p-4 rounded-xl border border-white/10">
+                            <span class="flex items-center"><i data-lucide="code" class="mr-3"></i> 分析結果
+                                (.json)</span>
+                            <i data-lucide="external-link" class="size-4 opacity-50"></i>
+                        </a>
                         <a id="source-link" href="#" target="_blank"
                             class="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors p-4 rounded-xl border border-white/10">
                             <span class="flex items-center"><i data-lucide="external-link" class="mr-3"></i>
@@ -625,6 +631,7 @@
 
             // 資源下載與連結
             document.getElementById('download-srt').href = data.srt_url;
+            document.getElementById('download-json').href = data.json_url || "#";
             document.getElementById('source-link').href = originalUrl;
 
             lucide.createIcons();
