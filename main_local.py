@@ -3,11 +3,13 @@ import os
 import sys
 import threading  # 👈 新增：多執行緒套件
 import tempfile
-from flask import Flask  # 👈 新增：輕量網頁框架
+from flask import Flask, request, jsonify  # 👈 新增：request, jsonify
+from flask_cors import CORS  # 👈 新增：允許跨網域請求
 import firebase_admin
 from firebase_admin import credentials, firestore
 from google.cloud.firestore import FieldFilter
-from processor_local import process_audio_pipeline, run_gemini_analysis
+from processor_local import process_audio_pipeline, run_gemini_analysis, GEMINI_MODEL
+from chat_Gemini_local import handle_chat_request # 👈 新增：外掛對話模組
 from firebase_storage_local import (
     upload_file_to_storage,
     find_file_in_storage,
@@ -365,22 +367,27 @@ def on_snapshot(col_snapshot, changes, read_time):
 
 
 # ==========================================
-# [四、 Web Service 偽裝與主程式進入點]
+# [四、 Web Service 偽裝與 API 端點]
 # ==========================================
 # 建立一個輕量的 Flask 網頁應用程式
 app = Flask(__name__)
-
+CORS(app)  # 允許跨網域，讓本地 HTML 可以 fetch
 
 @app.route("/")
 def home():
     # 當有人連線到這個網址時，顯示這段文字證明我們活著
-    return "🚀 Podcast Analyzer Backend is Alive and Running!"
+    return "🚀 Podcast Analyzer Local Backend is Alive and Running!"
+
+@app.route("/chat", methods=["POST"])
+def chat_with_gemini():
+    """將對話請求交給專屬模組處理"""
+    return handle_chat_request(db, request.get_json())
 
 
 def run_server():
     # Render 會動態分配一個 PORT 環境變數，我們必須監聽這個 Port
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=False)
 
 
 if __name__ == "__main__":

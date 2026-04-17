@@ -170,9 +170,68 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- 💬 Chat with Gemini 啟動按鈕 (預設隱藏，分析完成後顯示) -->
+                <div id="chat-launcher" class="hidden mt-8">
+                    <button onclick="toggleChat()" class="w-full relative group overflow-hidden rounded-2xl shadow-lg border border-slate-200 transition-all hover:shadow-xl">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-transform group-hover:scale-[1.02]"></div>
+                        <div class="relative flex items-center justify-between p-6">
+                            <div class="flex items-center text-white">
+                                <div class="bg-white/20 p-3 rounded-full mr-4 backdrop-blur-sm">
+                                    <i data-lucide="bot" class="size-6 text-white"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-bold text-lg">與大腦深度對話</h4>
+                                    <p class="text-blue-100 text-sm mt-1">針對這集內容繼續追問 Gemini AI</p>
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-right" class="size-6 text-white opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </button>
+                </div>
+
             </div>
         </div>
     </main>
+
+    <!-- 💬 AdminLTE 風格的 Direct Chat 對話視窗 -->
+    <div id="chat-window" class="fixed bottom-0 right-0 w-full md:w-[450px] bg-white border-t border-l border-slate-200 shadow-2xl flex flex-col z-50 transition-transform duration-300 transform translate-y-full" style="height: 600px; max-height: 80vh; border-top-left-radius: 1rem;">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-4 flex justify-between items-center rounded-tl-2xl cursor-pointer" onclick="toggleChat()">
+            <div class="flex items-center">
+                <i data-lucide="bot" class="mr-2 size-5 text-blue-400"></i>
+                <h3 class="font-bold text-md">Gemini 大腦助手</h3>
+                <span class="ml-3 px-2 py-0.5 text-xs bg-slate-600 rounded-full">連線中</span>
+            </div>
+            <button class="focus:outline-none hover:bg-slate-600 p-1 rounded transition-colors">
+                <i data-lucide="chevron-down" class="size-5"></i>
+            </button>
+        </div>
+
+        <!-- Chat Messages Area -->
+        <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-[#f4f6f9] space-y-4">
+            <!-- 預設歡迎訊息 -->
+            <div class="flex flex-col mb-4 max-w-[85%] relative">
+                <div class="flex items-baseline mb-1">
+                    <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
+                </div>
+                <div class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm">
+                    嗨！我已經消化完這集 Podcast 的所有內容了。關於這集，你有什麼想更深入了解的嗎？
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="p-3 border-t bg-white">
+            <form id="chat-form" class="relative flex items-center" onsubmit="sendChatMessage(event)">
+                <input type="text" id="chat-input" class="w-full bg-slate-100 border-none rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type Message ..." autocomplete="off">
+                <button type="submit" id="chat-submit-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 transition-colors focus:outline-none">
+                    <i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- 架構說明 Modal -->
     <div id="architecture-modal"
@@ -239,6 +298,67 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- 💬 Gemini 聊天視窗 (浮動式) -->
+    <div id="chat-container" class="hidden fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
+        <!-- 對話視窗本體 -->
+        <div id="chat-window" class="w-[380px] h-[500px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col transition-all duration-300 translate-y-full opacity-0 pointer-events-none mb-4">
+            <!-- Header -->
+            <div class="bg-slate-900 p-4 text-white flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="bg-blue-500 p-1.5 rounded-lg mr-3">
+                        <i data-lucide="bot" class="size-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-sm leading-none mb-1">Gemini AI 助手</h5>
+                        <p id="chat-status" class="text-[10px] text-slate-400 flex items-center">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+                            正在對話中
+                        </p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="hover:bg-white/10 p-1 rounded-lg transition-colors">
+                    <i data-lucide="chevron-down" class="size-5"></i>
+                </button>
+            </div>
+
+            <!-- Messages List -->
+            <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-slate-50 space-y-4 flex flex-col">
+                <!-- AI Welcome Message -->
+                <div class="flex flex-col mb-4 max-w-[85%] relative">
+                    <div class="flex items-baseline mb-1">
+                        <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
+                    </div>
+                    <div class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm">
+                        您好！我是您的進階 Podcast 分析助手。我已經閱讀完這集節目的逐字稿，您可以問我任何細節。
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 border-t border-slate-100 bg-white">
+                <form onsubmit="sendChatMessage(event)" class="flex items-center gap-2">
+                    <input type="text" id="chat-input" 
+                        class="flex-grow bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="請輸入您的問題...">
+                    <button type="submit" id="chat-submit-btn"
+                        class="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center">
+                        <i data-lucide="send" class="size-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 浮動啟動按鈕 -->
+        <button onclick="toggleChat()" 
+            class="bg-slate-900 text-white p-4 rounded-full shadow-xl hover:bg-blue-600 transition-all active:scale-95 group relative">
+            <i data-lucide="message-square" class="size-6"></i>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </span>
+        </button>
     </div>
 
     <footer class="py-8 text-center text-slate-400 text-sm border-t bg-white">
@@ -373,45 +493,68 @@
             }
         };
 
-        // 🛠️ 模擬演示模式
-        function runDemoMode() {
-            const testData = {
-                title: "【股癌】GTC 大會與 AI 伺服器供應鏈深度解析 (Demo)",
-                investment_insight: "1. 記憶體市場現況：\n旺宏 (NOR Flash、EMMC) 受惠於 AI 伺服器排擠效應，獲得成長機會，並提及美光毛利傳聞及各廠積極資本支出，顯示產業普遍看好。\n\n2. NVIDIA GTC 展望：\n預期光通訊解決方案 (CPO) 可能成為亮點，並建議投資者在重大事件前審慎調整部位。\n\n3. Tesla 投資警示：\n雖面臨 Robotaxi 質疑，但供應鏈訂單數據預示其潛在爆發力，同時警示其高估值帶來的投資風險。",
-                highlights: [
-                    { timeStart: "00:05:20", desc: "市場戰鬥週與心態調整" },
-                    { timeStart: "00:15:45", desc: "旺宏與記憶體產業受惠細節" },
-                    { timeStart: "00:45:10", desc: "NVIDIA 與光通訊族群觀察" }
-                ],
-                stocks: ["旺宏", "美光", "NVIDIA", "Tesla", "台積電", "鴻海"],
-                sectors: ["CPO", "NOR Flash", "AI伺服器", "光通訊", "Robotaxi", "半導體"],
-                srt_url: "#",
-                timestamp: { toDate: () => new Date() },
-                metadata: {
-                    thumbnail: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/04/b5/eb/04b5ebdf-7072-21fc-5876-e5feb5ba3dac/mza_7653733142335128691.jpeg/300x300bb.webp",
-                    title: "【股癌】GTC大會與AI伺服器供應鏈深度解析",
-                    channel: "Gooaye 股癌",
-                    duration_text: "58:42"
-                }
-            };
-
+        // 🛠️ 模擬演示模式 (串接 TEST.json 與 Chat 對話)
+        async function runDemoMode() {
             document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('progress-bar').style.width = "100%";
-            document.getElementById('progress-msg').innerText = "正在載入模擬數據...";
+            document.getElementById('content').classList.add('hidden');
+            document.getElementById('pre-info').classList.add('hidden');
+            document.getElementById('progress-bar').style.width = "50%";
+            document.getElementById('progress-msg').innerText = "📥 正在請求本地 TEST.json 測試檔案...";
+            document.getElementById('task-status').innerText = "讀取測試資料中...";
 
-            setTimeout(() => {
-                const infoBox = document.getElementById('pre-info');
-                infoBox.classList.remove('hidden');
-                document.getElementById('pre-thumb').src = testData.metadata.thumbnail;
-                document.getElementById('pre-title').innerText = testData.metadata.title;
-                document.getElementById('pre-channel').innerText = testData.metadata.channel;
-                document.getElementById('pre-duration').innerText = testData.metadata.duration_text;
+            try {
+                // 從本地 TEST.json 讀取真實結構
+                const response = await fetch('TEST.json');
+                if (!response.ok) throw new Error("找不到 TEST.json");
+                const testData = await response.json();
 
-                updateUI(testData, "https://podcasts.apple.com/tw/podcast/ep644/id1500839292?i=1000755239861");
+                // 為了相容預覽卡片，若測試檔案沒有提供 metadata 則代入預設值
+                if (!testData.metadata) {
+                    testData.metadata = {
+                        thumbnail: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/04/b5/eb/04b5ebdf-7072-21fc-5876-e5feb5ba3dac/mza_7653733142335128691.jpeg/300x300bb.webp",
+                        title: testData.title || "測試 Podcast (來自 TEST.json)",
+                        channel: "測試頻道",
+                        duration_text: "00:00 (DEMO)"
+                    };
+                }
+
+                // 處理 Firestore 舊版時間與 JSON 時間相容性
+                if (testData.timestamp && typeof testData.timestamp === 'string') {
+                    const d = new Date(testData.timestamp);
+                    testData.timestamp = { toDate: () => d };
+                } else if (!testData.timestamp) {
+                    testData.timestamp = { toDate: () => new Date() };
+                }
+
+                document.getElementById('progress-bar').style.width = "100%";
+                document.getElementById('progress-msg').innerText = "✨ 測試資料載入完成";
+
+                setTimeout(() => {
+                    const infoBox = document.getElementById('pre-info');
+                    infoBox.classList.remove('hidden');
+                    document.getElementById('pre-thumb').src = testData.metadata.thumbnail;
+                    document.getElementById('pre-title').innerText = testData.metadata.title;
+                    document.getElementById('pre-channel').innerText = testData.metadata.channel;
+                    document.getElementById('pre-duration').innerText = testData.metadata.duration_text;
+
+                    // 套用結果至畫面
+                    updateUI(testData, "https://apple.com/test-podcast");
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('content').classList.remove('hidden');
+                    document.getElementById('task-status').innerText = "✅ 成功進入測試與對話模式";
+
+                    // 【核心連動功能】標記這是一個測試任務，讓開啟聊天時給後端識別
+                    window.currentChatTaskId = "test_demo_task";
+                    window.currentPodcastTitle = testData.title || "測試 Podcast";
+                    document.getElementById('chat-container').classList.remove('hidden');
+
+                }, 800);
+
+            } catch (err) {
+                alert("進入測試模式失敗 (請確認目錄中是否有 TEST.json): \n" + err);
                 document.getElementById('loading').classList.add('hidden');
-                document.getElementById('content').classList.remove('hidden');
-                document.getElementById('task-status').innerText = "✨ 測試模式載入完成";
-            }, 1000);
+                document.getElementById('task-status').innerText = "❌ 測試模式啟動失敗";
+            }
         }
 
         window.clearInput = () => {
@@ -497,6 +640,11 @@
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
+                
+                // 顯示 Chat Launcher，將 taskId 綁定給全域變數供對話使用
+                window.currentChatTaskId = taskId;
+                document.getElementById('chat-launcher').classList.remove('hidden');
+
                 document.getElementById('task-status').innerText = "分析完成！";
 
                 // 任務完成後取消監聽
@@ -560,6 +708,136 @@
 
             lucide.createIcons();
         }
+
+        // ==========================================
+        // 💬 Chat with Gemini 邏輯
+        // ==========================================
+        window.toggleChat = function() {
+            const chatWindow = document.getElementById('chat-window');
+            const isClosed = chatWindow.classList.contains('translate-y-full');
+            
+            if (isClosed) {
+                // 打開
+                chatWindow.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+                chatWindow.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            } else {
+                // 收折
+                chatWindow.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                chatWindow.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+            }
+        };
+
+        function addMessageToUI(sender, text, isHtml = false) {
+            const chatMessages = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (sender === 'You') {
+                msgDiv.className = 'flex flex-col mb-4 max-w-[85%] self-end ml-auto relative';
+                msgDiv.innerHTML = `
+                    <div class="flex items-baseline mb-1 justify-end">
+                        <span class="font-bold text-slate-800 text-sm ml-2">You</span>
+                    </div>
+                    <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-2 shadow-sm text-sm">
+                        ${text}
+                    </div>
+                `;
+            } else {
+                // Gemini HTML
+                // 將 markdown 換行轉成 br
+                const formattedText = isHtml ? text : text.replace(/\\n/g, '<br>');
+                msgDiv.className = 'flex flex-col mb-4 max-w-[85%] relative';
+                msgDiv.innerHTML = `
+                    <div class="flex items-baseline mb-1">
+                        <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
+                    </div>
+                    <div class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm" style="word-wrap: break-word;">
+                        ${formattedText}
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // 自動向下滾動
+        }
+
+        window.sendChatMessage = async function(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chat-input');
+            const submitBtn = document.getElementById('chat-submit-btn');
+            const message = inputEl.value.trim();
+            const taskId = window.currentChatTaskId;
+
+            if (!message || !taskId) return;
+
+            // 1. 顯示使用者訊息
+            addMessageToUI('You', message);
+            inputEl.value = '';
+            
+            // 2. 顯示等待中 UI
+            inputEl.disabled = true;
+            submitBtn.innerHTML = '<i class="lucide lucide-loader animate-spin size-4 -ml-0.5 mt-0.5"></i>';
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // 新增暫時的輸入指示器
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'chat-typing-indicator';
+            loadingDiv.className = 'flex flex-col mb-4 max-w-[85%] relative';
+            loadingDiv.innerHTML = `
+                <div class="flex items-baseline mb-1">
+                    <span class="font-bold text-slate-800 text-sm mr-2">Gemini</span>
+                </div>
+                <div class="bg-white border border-slate-200 text-slate-400 rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm text-sm italic">
+                    <span id="chat-loading-text">正在思考與閱讀逐字稿...</span>
+                </div>
+            `;
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // 💡 增加動態回饋：如果超過 10 秒沒回應，提示使用者可能正在重試
+            const loadingTimer = setTimeout(() => {
+                const loadingText = document.getElementById('chat-loading-text');
+                if (loadingText) {
+                    loadingText.innerHTML = 'AI 伺服器目前較擁擠，正在努力重新連線中，請稍候...';
+                    loadingText.classList.add('text-orange-500');
+                }
+            }, 10000);
+
+            try {
+                // 發送 POST 到本地後端 /chat API
+                const response = await fetch('http://localhost:10000/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ taskId: taskId, message: message })
+                });
+
+                clearTimeout(loadingTimer); // 成功拿到結果，清除定時器
+                const data = await response.json();
+                
+                // 移除 typing indicator
+                const indicator = document.getElementById('chat-typing-indicator');
+                if(indicator) indicator.remove();
+
+                if (data.status === 'success') {
+                    // 回收換行符號
+                    let reply = data.reply.replace(/\n(.*)/g, "<br>$1"); 
+                    // 為了粗體等 markdown 也替換
+                    reply = reply.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                    addMessageToUI('Gemini', reply, true);
+                } else {
+                    addMessageToUI('Gemini', '<span class="text-red-500">❌ ' + (data.message || 'API 發生錯誤') + '</span>', true);
+                }
+            } catch (error) {
+                const indicator = document.getElementById('chat-typing-indicator');
+                if(indicator) indicator.remove();
+                addMessageToUI('Gemini', '<span class="text-red-500">❌ 無法連線到後端，請確認 main_local.py 正在運行</span>', true);
+            } finally {
+                inputEl.disabled = false;
+                // 恢復送出圖示 (因動態建立需重新呼叫 lucide)
+                submitBtn.innerHTML = '<i data-lucide="send" class="size-4 -ml-0.5 mt-0.5"></i>';
+                lucide.createIcons();
+                inputEl.focus();
+            }
+        };
 
         lucide.createIcons();
 
