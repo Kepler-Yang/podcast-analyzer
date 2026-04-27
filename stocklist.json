@@ -1,0 +1,1442 @@
+[
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "TWO",
+    "stockID": "3363",
+    "stock": "上詮"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "3715",
+    "定穎投控": "定穎投控",
+    "stock": "定穎投控"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TW",
+    "stockID": "2337",
+    "stock": "旺宏"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "US",
+    "stockID": "SNDK",
+    "stock": "Sandisk"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "AXTI",
+    "stock": "AXT"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "US",
+    "stockID": "MU",
+    "stock": "Micron"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "AAOI",
+    "stock": "Applied Opto"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TW",
+    "stockID": "2344",
+    "stock": "華邦電"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "1504",
+    "stock": "東元"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TW",
+    "stockID": "6139",
+    "stock": "亞翔"
+  },
+  {
+    "sectors": [
+      "載板",
+      "PCB"
+    ],
+    "country": "TWO",
+    "stockID": "8358",
+    "stock": "金居"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "US",
+    "stockID": "VSAT",
+    "stock": "Viasat"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TWO",
+    "stockID": "3211",
+    "stock": "順達"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "FSLR",
+    "stock": "First Solar"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "3026",
+    "stock": "禾伸堂"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "1503",
+    "stock": "士林電機"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "KS",
+    "stockID": "005930",
+    "stock": "Samsung Elec."
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "2301",
+    "stock": "光寶科"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "KS",
+    "stockID": "000660",
+    "stock": "SK Hynix"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TWO",
+    "stockID": "5536",
+    "stock": "聖輝*"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "3037",
+    "stock": "欣興"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "OCS"
+    ],
+    "country": "US",
+    "stockID": "AVGO",
+    "stock": "Broadcom"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TW",
+    "stockID": "2408",
+    "stock": "南亞科"
+  },
+  {
+    "sectors": [
+      "科技巨頭"
+    ],
+    "country": "TW",
+    "stockID": "2454",
+    "stock": "聯發科"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "6781",
+    "stock": "AES-KY"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "US",
+    "stockID": "STX",
+    "stock": "Seagate"
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "CPU"
+    ],
+    "country": "US",
+    "stockID": "AMD",
+    "stock": "AMD"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "OCS",
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "LITE",
+    "stock": "Lumentum"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "US",
+    "stockID": "WDC",
+    "stock": "Western Digi."
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "NVDA",
+    "stock": "Nvidia"
+  },
+  {
+    "sectors": [
+      "AEC"
+    ],
+    "country": "US",
+    "stockID": "CRDO",
+    "stock": "Credo"
+  },
+  {
+    "sectors": [
+      "CPO設備"
+    ],
+    "country": "TWO",
+    "stockID": "6187",
+    "stock": "萬潤"
+  },
+  {
+    "sectors": [
+      "PCB"
+    ],
+    "country": "TW",
+    "stockID": "2368",
+    "stock": "金像電"
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "CPU"
+    ],
+    "country": "US",
+    "stockID": "INTC",
+    "stock": "Intel"
+  },
+  {
+    "sectors": [
+      "科技巨頭"
+    ],
+    "country": "US",
+    "stockID": "QCOM",
+    "stock": "Qualcomm"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TWO",
+    "stockID": "6274",
+    "stock": "台燿"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "BE",
+    "stock": "Bloom Energy"
+  },
+  {
+    "sectors": [
+      "ACC"
+    ],
+    "country": "TW",
+    "stockID": "3605",
+    "stock": "宏致"
+  },
+  {
+    "sectors": [
+      "載板",
+      "低軌衛星",
+      "PCB"
+    ],
+    "country": "TW",
+    "stockID": "2383",
+    "stock": "台光電"
+  },
+  {
+    "sectors": [
+      "載板",
+      "PCB"
+    ],
+    "country": "TW",
+    "stockID": "4958",
+    "stock": "臻鼎-KY"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "TSEM",
+    "stock": "Tower Semi."
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "TWO",
+    "stockID": "3491",
+    "stock": "昇達科"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "3189",
+    "stock": "景碩"
+  },
+  {
+    "sectors": [
+      "ASIC"
+    ],
+    "country": "TW",
+    "stockID": "3443",
+    "stock": "創意"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "SZ",
+    "stockID": "300308",
+    "stock": "中際旭創"
+  },
+  {
+    "sectors": [
+      "低軌衛星",
+      "PCB"
+    ],
+    "country": "TW",
+    "stockID": "2313",
+    "stock": "華通"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "MRVL",
+    "stock": "Marvell"
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "ADBE",
+    "stock": "Adobe"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "2327",
+    "stock": "國巨*"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "TW",
+    "stockID": "2330",
+    "stock": "台積電"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TWO",
+    "stockID": "3357",
+    "stock": "臺慶科"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "8046",
+    "stock": "南電"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "SZ",
+    "stockID": "300502",
+    "stock": "新易盛"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "1519",
+    "stock": "華城"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "2308",
+    "stock": "台達電"
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "NOW",
+    "stock": "ServiceNow"
+  },
+  {
+    "sectors": [
+      "DAC",
+      "CPU"
+    ],
+    "country": "TW",
+    "stockID": "3533",
+    "stock": "嘉澤"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TW",
+    "stockID": "2345",
+    "stock": "智邦"
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "CRM",
+    "stock": "Salesforce"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TW",
+    "stockID": "2404",
+    "stock": "漢唐"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "TW",
+    "stockID": "2455",
+    "stock": "全新"
+  },
+  {
+    "sectors": [
+      "DAC",
+      "ACC",
+      "AEC"
+    ],
+    "country": "TW",
+    "stockID": "3665",
+    "stock": "貿聯-KY"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "AMKR",
+    "stock": "Amkor"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "US",
+    "stockID": "PSTG",
+    "stock": "Pure Storage"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "TWO",
+    "stockID": "3081",
+    "stock": "聯亞"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "COHR",
+    "stock": "Coherent"
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "INTU",
+    "stock": "Intuit"
+  },
+  {
+    "sectors": [
+      "科技巨頭"
+    ],
+    "country": "US",
+    "stockID": "META",
+    "stock": "Meta"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TW",
+    "stockID": "3042",
+    "stock": "晶技"
+  },
+  {
+    "sectors": [
+      "ACC",
+      "LPO"
+    ],
+    "country": "US",
+    "stockID": "SMTC",
+    "stock": "Semtech"
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "低軌衛星"
+    ],
+    "country": "US",
+    "stockID": "AMZN",
+    "stock": "Amazon"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TWO",
+    "stockID": "4971",
+    "stock": "IET-KY"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "VRT",
+    "stock": "Vertiv"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "US",
+    "stockID": "SATS",
+    "stock": "EchoStar"
+  },
+  {
+    "sectors": [
+      "AI",
+      "CPU"
+    ],
+    "country": "TWO",
+    "stockID": "5274",
+    "stock": "信驊"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "TW",
+    "stockID": "6257",
+    "stock": "矽格"
+  },
+  {
+    "sectors": [
+      "AEC",
+      "CPU"
+    ],
+    "country": "US",
+    "stockID": "ALAB",
+    "stock": "Astera"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO",
+      "OCS"
+    ],
+    "country": "SZ",
+    "stockID": "300394",
+    "stock": "天孚通信"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "TWO",
+    "stockID": "3105",
+    "stock": "穩懋"
+  },
+  {
+    "sectors": [
+      "CPO設備"
+    ],
+    "country": "TW",
+    "stockID": "2360",
+    "stock": "致茂"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "2467",
+    "stock": "志聖"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TWO",
+    "stockID": "6725",
+    "stock": "矽科宏晟"
+  },
+  {
+    "sectors": [
+      "DAC"
+    ],
+    "country": "US",
+    "stockID": "APH",
+    "stock": "Amphenol"
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "OCS"
+    ],
+    "country": "US",
+    "stockID": "GOOG",
+    "stock": "Google"
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "SNPS",
+    "stock": "Synopsys"
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "Software",
+      "CSP"
+    ],
+    "country": "US",
+    "stockID": "MSFT",
+    "stock": "Microsoft"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "ETN",
+    "stock": "Eaton"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "US",
+    "stockID": "GLW",
+    "stock": "Corning"
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "PLTR",
+    "stock": "Palantir"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "US",
+    "stockID": "ANET",
+    "stock": "Arista"
+  },
+  {
+    "sectors": [
+      "Software",
+      "CPU"
+    ],
+    "country": "US",
+    "stockID": "CDNS",
+    "stock": "Cadence"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "FN",
+    "stock": "Fabrinet"
+  },
+  {
+    "sectors": [
+      "OCS",
+      "CPO",
+      "設備"
+    ],
+    "country": "US",
+    "stockID": "VIAV",
+    "stock": "Viavi solution"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "TW",
+    "stockID": "5388",
+    "stock": "中磊"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "ACC",
+      "LPO"
+    ],
+    "country": "US",
+    "stockID": "MTSI",
+    "stock": "Macom"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TW",
+    "stockID": "6196",
+    "stock": "帆宣"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "US",
+    "stockID": "NOC",
+    "stock": "Northrop Grum."
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "PWR",
+    "stock": "Quanta Serv."
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "US",
+    "stockID": "LMT",
+    "stock": "Lockheed Mart."
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "NEE",
+    "stock": "NextEra Energy"
+  },
+  {
+    "sectors": [
+      "CPO",
+      "設備"
+    ],
+    "country": "US",
+    "stockID": "AEHR",
+    "stock": "Aehr Test"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "SO",
+    "stock": "Southern"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "DUK",
+    "stock": "Duke Energy"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "D",
+    "stock": "Dominion Ener."
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "CRWD",
+    "stock": "CrowdStrike"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "HUBB",
+    "stock": "Hubbell"
+  },
+  {
+    "sectors": [
+      "Software"
+    ],
+    "country": "US",
+    "stockID": "PANW",
+    "stock": "Palo Alto"
+  },
+  {
+    "sectors": [
+      "科技巨頭"
+    ],
+    "country": "US",
+    "stockID": "AAPL",
+    "stock": "Apple"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "1802",
+    "stock": "台玻"
+  },
+  {
+    "sectors": [
+      "CSP"
+    ],
+    "country": "US",
+    "stockID": "ORCL",
+    "stock": "Oracle"
+  },
+  {
+    "sectors": [
+      "IC設計"
+    ],
+    "country": "US",
+    "stockID": "SITM",
+    "stock": "SiTime"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "US",
+    "stockID": "FORM",
+    "stock": "Form Factor"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "US",
+    "stockID": "GEV",
+    "stock": "GE Vernova"
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "CPU"
+    ],
+    "country": "US",
+    "stockID": "ARM",
+    "stock": "ARM"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "2492",
+    "stock": "華星科"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "TW",
+    "stockID": "6285",
+    "stock": "啟碁"
+  },
+  {
+    "sectors": [
+      "科技巨頭"
+    ],
+    "country": "US",
+    "stockID": "TSLA",
+    "stock": "Tesla"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "2371",
+    "stock": "大同"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "7795",
+    "stock": "長廣"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "OCS"
+    ],
+    "country": "TW",
+    "stockID": "6442",
+    "stock": "光聖"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "US",
+    "stockID": "RKLB",
+    "stock": "Rocket Lab"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TWO",
+    "stockID": "1815",
+    "stock": "富喬"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "2375",
+    "stock": "凱美"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "2428",
+    "stock": "興勤"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TW",
+    "stockID": "2451",
+    "stock": "創見"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "2472",
+    "stock": "立隆電"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "TW",
+    "stockID": "2489",
+    "stock": "瑞軒"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "TW",
+    "stockID": "3062",
+    "stock": "建漢"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "TWO",
+    "stockID": "3163",
+    "stock": "波若威"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TWO",
+    "stockID": "3260",
+    "stock": "威剛"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TWO",
+    "stockID": "3265",
+    "stock": "台星科"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TWO",
+    "stockID": "3402",
+    "stock": "漢科"
+  },
+  {
+    "sectors": [
+      "光通訊",
+      "CPO"
+    ],
+    "country": "TW",
+    "stockID": "3450",
+    "stock": "聯鈞"
+  },
+  {
+    "sectors": [
+      "CPO設備"
+    ],
+    "country": "TWO",
+    "stockID": "3498",
+    "stock": "陽程"
+  },
+  {
+    "sectors": [
+      "OCS"
+    ],
+    "country": "TWO",
+    "stockID": "4908",
+    "stock": "前鼎"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TWO",
+    "stockID": "4931",
+    "stock": "新盛力"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TW",
+    "stockID": "4967",
+    "stock": "十銓"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TWO",
+    "stockID": "4973",
+    "stock": "廣穎"
+  },
+  {
+    "sectors": [
+      "CPO"
+    ],
+    "country": "TW",
+    "stockID": "4977",
+    "stock": "眾達-KY"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TWO",
+    "stockID": "4979",
+    "stock": "華星光"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TW",
+    "stockID": "4989",
+    "stock": "榮科"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TWO",
+    "stockID": "5289",
+    "stock": "宜鼎"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TWO",
+    "stockID": "5309",
+    "stock": "系統電"
+  },
+  {
+    "sectors": [
+      "CPO設備",
+      "載板"
+    ],
+    "country": "TWO",
+    "stockID": "5443",
+    "stock": "均豪"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TWO",
+    "stockID": "6173",
+    "stock": "信昌電"
+  },
+  {
+    "sectors": [
+      "HVDC"
+    ],
+    "country": "TW",
+    "stockID": "6282",
+    "stock": "康舒"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TWO",
+    "stockID": "6291",
+    "stock": "沛亨"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "6449",
+    "stock": "鈺邦"
+  },
+  {
+    "sectors": [
+      "CPO",
+      "光通訊"
+    ],
+    "country": "TW",
+    "stockID": "6451",
+    "stock": "訊芯-KY"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TWO",
+    "stockID": "6588",
+    "stock": "東典科技"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TWO",
+    "stockID": "6667",
+    "stock": "信紘科"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TW",
+    "stockID": "6691",
+    "stock": "洋基工程"
+  },
+  {
+    "sectors": [
+      "CPO設備"
+    ],
+    "country": "TW",
+    "stockID": "6706",
+    "stock": "惠特"
+  },
+  {
+    "sectors": [
+      "ACC"
+    ],
+    "country": "TW",
+    "stockID": "6715",
+    "stock": "嘉基"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TW",
+    "stockID": "6770",
+    "stock": "力積電"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TW",
+    "stockID": "6862",
+    "stock": "三集瑞-KY"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TWO",
+    "stockID": "6903",
+    "stock": "巨漢"
+  },
+  {
+    "sectors": [
+      "光通訊"
+    ],
+    "country": "TWO",
+    "stockID": "7728",
+    "stock": "光焱科技"
+  },
+  {
+    "sectors": [
+      "OCS"
+    ],
+    "country": "TW",
+    "stockID": "8011",
+    "stock": "台通"
+  },
+  {
+    "sectors": [
+      "載板"
+    ],
+    "country": "TWO",
+    "stockID": "8027",
+    "stock": "鈦昇"
+  },
+  {
+    "sectors": [
+      "被動元件"
+    ],
+    "country": "TWO",
+    "stockID": "8043",
+    "stock": "蜜望實"
+  },
+  {
+    "sectors": [
+      "CPO設備",
+      "載板"
+    ],
+    "country": "TWO",
+    "stockID": "8064",
+    "stock": "東捷"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TW",
+    "stockID": "8271",
+    "stock": "宇瞻"
+  },
+  {
+    "sectors": [
+      "記憶體"
+    ],
+    "country": "TWO",
+    "stockID": "8299",
+    "stock": "群聯"
+  },
+  {
+    "sectors": [
+      "廠務工程"
+    ],
+    "country": "TWO",
+    "stockID": "8383",
+    "stock": "千附"
+  },
+  {
+    "sectors": [
+      "低軌衛星"
+    ],
+    "country": "US",
+    "stockID": "ASTS",
+    "stock": "AST SpaceMobi."
+  },
+  {
+    "sectors": [
+      "散熱"
+    ],
+    "country": "TW",
+    "stockID": "3017",
+    "stock": "奇鋐"
+  },
+  {
+    "sectors": [
+      "散熱"
+    ],
+    "country": "TW",
+    "stockID": "3324",
+    "stock": "雙鴻"
+  },
+  {
+    "sectors": [
+      "科技巨頭",
+      "AI伺服器代工"
+    ],
+    "country": "TW",
+    "stockID": "2317",
+    "stock": "鴻海"
+  },
+  {
+    "sectors": [
+      "AI伺服器代工"
+    ],
+    "country": "TW",
+    "stockID": "2382",
+    "stock": "廣達"
+  },
+  {
+    "sectors": [
+      "AI伺服器代工"
+    ],
+    "country": "TW",
+    "stockID": "3231",
+    "stock": "緯創"
+  },
+  {
+    "sectors": [
+      "封裝測試"
+    ],
+    "country": "TW",
+    "stockID": "3711",
+    "stock": "日月光投控"
+  },
+  {
+    "sectors": [
+      "AI伺服器"
+    ],
+    "country": "US",
+    "stockID": "SMCI",
+    "stock": "Supermicro"
+  },
+  {
+    "sectors": [
+      "散熱",
+      "機殼"
+    ],
+    "country": "TW",
+    "stockID": "3013",
+    "stock": "晟銘電"
+  }
+]
