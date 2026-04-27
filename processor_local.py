@@ -46,6 +46,21 @@ SYSTEM_PROMPT = """
 6. 語言：一律使用台灣繁體中文。
 """
 
+SRT_CORRECTION_PROMPT = """
+# Role
+你是一位專業的逐字稿校對員，精通財經、半導體與 AI 產業術語。
+
+# Task
+請校對下方的 SRT 逐字稿，修正語音辨識產生的錯字、同音異字與標點符號。
+
+# Rules
+1. **嚴禁修改時間戳 (Timestamps)**：例如 `00:01:23,456 --> 00:01:25,000` 必須原封不動保留。
+2. **實體對齊**：請優先參考提供的「標準清單」，將錯字修正為正確名稱。
+3. **語氣精煉**：在不改變語意的前提下，修正贅字（如：那那個、然後然後）。
+4. **輸出格式**：必須維持標準 SRT 格式輸出，不可遺漏任何段落。
+5. **語言**：統一使用「繁體中文」。
+"""
+
 def load_stock_reference():
     """從根目錄 stocklist.json 載入個股與族群參考清單"""
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -198,7 +213,9 @@ def process_audio_pipeline(url, task_id, db, temp_dir):
         srt_lines.append(f"{i}\n{format_time(seg['start'])} --> {format_time(seg['end'])}\n{seg['text'].strip()}\n")
     
     trans_srt = "\n".join(srt_lines)
-    with open(local_srt, "w", encoding="utf-8") as f: f.write(trans_srt)
+    
+    with open(local_srt, "w", encoding="utf-8") as f: 
+        f.write(trans_srt)
     
     return {"srt_path": local_srt, "srt_content": trans_srt}
 
@@ -240,3 +257,38 @@ def run_gemini_analysis(srt_content, output_json_path, task_id, db):
     with open(output_json_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     return data
+
+def batch_correct_srt(srt_content, db, task_id):
+    """將 SRT 分段並交由 Gemini 進行大規模校對"""
+    db.collection("tasks").document(task_id).update({"status_msg": "✍️ [3.5/5] 正在進行 SRT 全文精準校對... (分段處理中)", "progress": 75})
+    
+    lines = srt_content.strip().split('\n')
+    chunks = []
+    current_chunk = []
+    
+    # 每 100 個 SRT 區塊分為一組 (大約 400-500 行)
+    for i in range(0, len(lines), 400):
+        chunks.append("\n".join(lines[i:i+400]))
+        
+    api_key = os.environ.get("GEMINI_API_KEY")
+    client = genai.Client(api_key=api_key)
+    stock_ref_text, _ = load_stock_reference()
+    
+    corrected_chunks = []
+    for idx, chunk in enumerate(chunks):
+        print(f"📦 正在校對第 {idx+1}/{len(chunks)} 個區塊...")
+        final_prompt = f"請校對以下 SRT 內容段落：\n\n{chunk}\n\n參考資料：\n{stock_ref_text}"
+        
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=final_prompt,
+                    config={"system_instruction": SRT_CORRECTION_PROMPT.strip()}
+                )
+                corrected_chunks.append(response.text.strip())
+                break
+            except:
+                time.sleep(5)
+                
+    return "\n\n".join(corrected_chunks)

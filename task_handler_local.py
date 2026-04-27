@@ -2,9 +2,15 @@ import os
 import time
 import shutil
 import tempfile
+import threading
 from google.cloud.firestore import FieldFilter, SERVER_TIMESTAMP
 from config_local import db
-from processor_local import process_audio_pipeline, run_gemini_analysis, get_safe_filename
+from processor_local import (
+    process_audio_pipeline, 
+    run_gemini_analysis, 
+    get_safe_filename,
+    batch_correct_srt
+)
 from firebase_storage_local import (
     upload_file_to_storage,
     find_file_in_storage,
@@ -191,6 +197,14 @@ def handle_new_task(task_id, task_data):
         print(f"✨ 任務處理成功！ (ID: {task_id}, Transcript: {url_hash})")
         task_success = True
 
+        # 🚀 [核心優化] 啟動背景線程進行校對，不阻塞主流程回傳
+        bg_thread = threading.Thread(
+            target=run_background_correction,
+            args=(srt_content, local_srt, srt_cloud_path, url_hash, temp_dir, task_id),
+            daemon=True
+        )
+        bg_thread.start()
+
     except Exception as e:
         err_msg = str(e)
         print(f"🚨 任務異常中斷: {err_msg}")
@@ -200,10 +214,33 @@ def handle_new_task(task_id, task_data):
             "status_msg": "❌ 分析中斷，請稍後重試"
         })
     finally:
-        # 若成功，才清理暫存；失敗則保留，以便下次觸發時能斷點續跑
-        if task_success and os.path.exists(temp_dir):
+        # ⚠️ 注意：清理動作已移至 handle_new_task 最後或背景任務中執行
+        pass
+
+def run_background_correction(srt_content, local_srt, srt_cloud_path, url_hash, temp_dir, task_id):
+    """在背景執行校對並靜悄悄地覆蓋雲端檔案"""
+    try:
+        print(f"🕒 [背景任務] 開始為 {url_hash} 進行全文精準校對...")
+        corrected_srt = batch_correct_srt(srt_content, db, task_id)
+        
+        # 寫入本地並重新上傳覆蓋
+        with open(local_srt, "w", encoding="utf-8") as f:
+            f.write(corrected_srt)
+        
+        new_srt_url = upload_file_to_storage(local_srt, srt_cloud_path)
+        
+        # 更新 transcripts 文檔中的 srt_url (如果有變動)
+        db.collection("transcripts").document(url_hash).update({
+            "srt_url": new_srt_url
+        })
+        print(f"✅ [背景任務] SRT 全文校對並上傳完成！(ID: {url_hash})")
+    except Exception as e:
+        print(f"⚠️ [背景任務] 發生錯誤: {e}")
+    finally:
+        # 執行完畢才真正清理暫存
+        if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir, ignore_errors=True)
-            print("🧹 本地暫存檔案已清理")
+            print(f"🧹 [背景任務] 暫存檔案已清理 ({url_hash})")
 
 # ==========================================
 # [標記：T02] Firebase 變動監聽回呼
