@@ -42,22 +42,17 @@ def handle_new_task(task_id, task_data):
         db.collection("tasks").document(task_id).update({"status": "processing"})
 
         # =============================================
-        # 🎯 Layer 1: Firestore 全域快取檢查
+        # 🎯 Layer 1: Firestore 全域快取檢查 (改用 ID 直接查詢)
         # =============================================
         print("🔍 [Layer 1] 檢查 Firestore 是否已有分析紀錄...")
-        existing_docs = (
-            db.collection("transcripts")
-            .where(filter=FieldFilter("originalUrl", "==", url))
-            .limit(1)
-            .get()
-        )
+        doc_snap = db.collection("transcripts").document(url_hash).get()
 
-        for doc in existing_docs:
-            print(f"🎯 快取命中！正在同步資料...")
-            transcript_id = doc.id
+        if doc_snap.exists:
+            print(f"🎯 快取命中！正在同步資料 (ID: {url_hash})...")
+            transcript_id = url_hash
             
             # 更新 metadata 讓前端 UI 能顯示預覽卡片
-            old_data = doc.to_dict()
+            old_data = doc_snap.to_dict()
             if "metadata" in old_data:
                 db.collection("tasks").document(task_id).update({
                     "metadata": old_data["metadata"],
@@ -65,7 +60,7 @@ def handle_new_task(task_id, task_data):
                     "progress": 95
                 })
 
-            # 直接將既有的 transcriptId 關聯至當前任務，不再複製
+            # 直接將既有的 transcriptId 關聯至當前任務
             db.collection("tasks").document(task_id).update({
                 "status": "completed",
                 "transcriptId": transcript_id
