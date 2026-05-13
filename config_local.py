@@ -13,8 +13,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # 2. 定義全局常量 (SSOT: Single Source of Truth)
-GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
+GEMINI_MODEL = "gemini-3.1-flash-lite"
 STORAGE_BUCKET = "whisge-1683c.firebasestorage.app"
+
 
 # 3. Firebase 初始化邏輯
 def initialize_firebase():
@@ -24,7 +25,7 @@ def initialize_firebase():
     """
     if not firebase_admin._apps:
         print("🔄 正在初始化 Firebase 服務...")
-        
+
         # 路徑判斷
         cloud_key = "/etc/secrets/serviceAccountKey.json"
         local_key = os.path.join(BASE_DIR, "serviceAccountKey.json")
@@ -40,12 +41,11 @@ def initialize_firebase():
             sys.exit(1)
 
         cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred, {
-            "storageBucket": STORAGE_BUCKET
-        })
+        firebase_admin.initialize_app(cred, {"storageBucket": STORAGE_BUCKET})
         print("✅ Firebase 初始化完成")
 
     return firestore.client(), storage.bucket()
+
 
 # 導出全局實例供其他模組使用
 db, bucket = initialize_firebase()
