@@ -66,6 +66,15 @@
                 </div>
             </div>
             <p id="task-status" class="mt-3 text-xs text-slate-400 text-center"></p>
+            
+            <!-- 服務中斷提示 -->
+            <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="text-red-500 size-5 flex-shrink-0 mt-0.5"></i>
+                <div class="text-sm text-red-700 leading-relaxed">
+                    <strong>【服務異常公告】</strong> 由於近期 Gemini API 已停止支援 Render 位於新加坡 (東南亞) 的伺服器連線，雲端分析任務可能會遭遇失敗。<br>
+                    若發生錯誤，建議改用 <strong>Local Backend (本地版)</strong> 進行操作，造成您的不便敬請見諒。
+                </div>
+            </div>
         </section>
 
         <!-- S03: 全局影片預覽卡片 (顯示在輸入框下方，載入與結果區上方) -->
